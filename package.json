@@ -1,9 +1,13 @@
 {
   "name": "alphabet",
-  "module": "index.ts",
+  "main": "dist/index.js",
   "type": "module",
+  "scripts": {
+    "build": "tsup-node ./index.ts --format esm --dts"
+  },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "tsup": "^8.3.0"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
