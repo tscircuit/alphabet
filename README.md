@@ -25,7 +25,7 @@ The library exports two main objects:
 - `lineAlphabet`: Pre-processed line segments for each character, with coordinates normalized to [0,1]
 
 ```typescript
-import { svgAlphabet, lineAlphabet } from './index'
+import { svgAlphabet, lineAlphabet } from '@tscircuit/alphabet'
 
 // Get SVG path data for 'A'
 const aPath = svgAlphabet['A']
