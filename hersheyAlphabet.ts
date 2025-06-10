@@ -1,6 +1,11 @@
 import { stringToPaths } from "hershey"
 
-const CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.*()-+=_[]<>\\'\""
+// Full Hershey Roman Simplex character set
+const CHARACTERS =
+  "0123456789" +
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+  "abcdefghijklmnopqrstuvwxyz" +
+  ".,:;!?\"\u00b0$/()|-+='#&\\_*[]{}<>~%@"
 
 export const hersheyAlphabet: Record<string, string> = {}
 

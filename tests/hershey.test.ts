@@ -31,7 +31,7 @@ describe("SVG Character Snapshots", () => {
     
     for (let i = 0; i < numChars; i++) {
       const char = characters[i]
-      const charPath = hersheyAlphabet[char as keyof typeof fontkitAlphabet]
+      const charPath = hersheyAlphabet[char as keyof typeof hersheyAlphabet]
       
       const rowIndex = Math.floor(i / cols)
       const colIndex = i % cols
