@@ -4,8 +4,7 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "build": "tsup-node ./index.ts --format esm --dts",
-    "test": "bun test"
+    "build": "tsup-node ./index.ts --format esm --dts"
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -16,6 +15,6 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "hershey": "^2.1.7"
+    "fontkit": "^2.0.4"
   }
 }
