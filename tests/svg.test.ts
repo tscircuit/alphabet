@@ -52,4 +52,17 @@ describe("SVG Character Snapshots", () => {
     
     await expect(svgOutput).toMatchSvgSnapshot(import.meta.path)
   })
+
+  test("lowercase characters have unique paths", () => {
+    const alphabet = "abcdefghijklmnopqrstuvwxyz"
+
+    for (const ch of alphabet) {
+      const lower = svgAlphabet[ch as keyof typeof svgAlphabet]
+      const upper = svgAlphabet[ch.toUpperCase() as keyof typeof svgAlphabet]
+
+      expect(lower).toBeDefined()
+      expect(upper).toBeDefined()
+      expect(lower).not.toBe(upper)
+    }
+  })
 })
