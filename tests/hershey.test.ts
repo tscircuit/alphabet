@@ -1,9 +1,9 @@
 import { expect, test, describe } from "bun:test"
-import { fontkitAlphabet } from "../fontkitAlphabet"
+import { hersheyAlphabet } from "../hersheyAlphabet"
 
 describe("SVG Character Snapshots", () => {
   test("generates a single SVG snapshot for all characters", async () => {
-    const characters = Object.keys(fontkitAlphabet).sort() // Sort for consistent order
+    const characters = Object.keys(hersheyAlphabet).sort() // Sort for consistent order
     const numChars = characters.length
 
     if (numChars === 0) {
@@ -31,7 +31,7 @@ describe("SVG Character Snapshots", () => {
     
     for (let i = 0; i < numChars; i++) {
       const char = characters[i]
-      const charPath = fontkitAlphabet[char as keyof typeof fontkitAlphabet]
+      const charPath = hersheyAlphabet[char as keyof typeof fontkitAlphabet]
       
       const rowIndex = Math.floor(i / cols)
       const colIndex = i % cols
