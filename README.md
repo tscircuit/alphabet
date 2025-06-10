@@ -53,6 +53,12 @@ The project includes an SVG snapshot test that renders every character. Run:
 bun test
 ```
 
+To update the snapshot after modifying the character data, rerun the tests with
+the `--update-snapshots` flag:
+```bash
+bun test --update-snapshots
+```
+
 The generated snapshot can be found at `tests/__snapshots__/svg.snap.svg`.
 
 This project uses [Bun](https://bun.sh) as its JavaScript/TypeScript runtime.
