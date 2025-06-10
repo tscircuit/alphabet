@@ -64,5 +64,8 @@ describe("SVG Character Snapshots", () => {
       expect(upper).toBeDefined()
       expect(lower).not.toBe(upper)
     }
+
+    const lowerCaseCount = Object.keys(svgAlphabet).filter((c) => /[a-z]/.test(c)).length
+    expect(lowerCaseCount).toBe(26)
   })
 })
