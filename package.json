@@ -5,8 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsup-node ./index.ts --format esm --dts",
-    "test": "bun test",
-    "generate-svg": "bun scripts/generate-svg.ts"
+    "test": "bun test"
   },
   "devDependencies": {
     "@types/bun": "latest",
