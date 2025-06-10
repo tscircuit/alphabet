@@ -1,6 +1,11 @@
 import hershey from 'hershey'
+import rawCharNumbers from 'hershey/lib/characterNumbers.js'
 
-const CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.*()-+=_[]<>'\"";
+const charNumbers: Record<string, number> =
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (rawCharNumbers as any).default ?? (rawCharNumbers as any)
+
+const CHARACTERS = Object.keys(charNumbers).filter(c => c !== ' ')
 
 
 export const svgAlphabet: Record<string, string> = {};

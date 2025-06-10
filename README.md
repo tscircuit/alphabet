@@ -7,7 +7,8 @@ Simplex font, then normalized to fit within a `1x1` unit square.
 
 ## Features
 
-- SVG path data for letters A-Z, numbers 0-9, and common symbols
+- SVG path data for the full Hershey Roman Simplex character set
+- Includes digits, upper and lower case letters, and many punctuation marks
 - Normalized coordinates (all paths fit in [0,1] x [0,1] bounds)
 - Line segment representation for each character
 - Support for basic punctuation and mathematical symbols
