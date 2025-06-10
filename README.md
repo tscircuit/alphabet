@@ -4,7 +4,8 @@ A TypeScript library that provides SVG path data and line segments for rendering
 
 ## Features
 
- - SVG path data for letters A-Z, **lowercase a-z**, numbers 0-9, and common symbols
+- SVG path data for letters A-Z, **lowercase a-z**, numbers 0-9, and common symbols
+- Includes punctuation characters such as `:`, `!`, and `?`
 - Normalized coordinates (all paths fit in [0,1] x [0,1] bounds)
 - Line segment representation for each character
 - Support for basic punctuation and mathematical symbols
