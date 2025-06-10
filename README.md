@@ -47,4 +47,12 @@ To run the project:
 bun run index.ts
 ```
 
+To generate an `characters.svg` file visualizing every character, run:
+
+```bash
+npm run generate-svg
+```
+
+The resulting file will be written to the project root and can be opened in a browser to inspect the glyphs.
+
 This project uses [Bun](https://bun.sh) as its JavaScript/TypeScript runtime.
