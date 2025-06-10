@@ -1,6 +1,9 @@
 # Alphabet SVG Path Library
 
-A TypeScript library that provides SVG path data and line segments for rendering letters, numbers and basic symbols. Each character is normalized to fit within a 1x1 unit square.
+A TypeScript library that provides SVG path data and line segments for rendering
+letters, numbers and basic symbols. The character outlines are generated at
+runtime using the [Hershey](https://www.npmjs.com/package/hershey) Roman
+Simplex font, then normalized to fit within a `1x1` unit square.
 
 ## Features
 
@@ -8,6 +11,7 @@ A TypeScript library that provides SVG path data and line segments for rendering
 - Normalized coordinates (all paths fit in [0,1] x [0,1] bounds)
 - Line segment representation for each character
 - Support for basic punctuation and mathematical symbols
+- Powered by the open source `hershey` font package
 
 ## Installation
 
@@ -19,7 +23,8 @@ bun install
 
 ## Usage
 
-The library exports two main objects:
+The library exports two main objects. Character outlines are generated on import
+using the Hershey font:
 
 - `svgAlphabet`: Raw SVG path data for each character
 - `lineAlphabet`: Pre-processed line segments for each character, with coordinates normalized to [0,1]
