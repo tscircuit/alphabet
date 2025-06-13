@@ -1,22 +1,42 @@
 import opentype from "opentype.js"
 import { svgAlphabet } from "./index"
 import { writeFileSync } from "fs"
+import { parseSVG } from "svg-path-parser"
 
 export const unitsPerEm = 1000
 
 export function svgToPath(d: string): opentype.Path {
   const path = new opentype.Path()
-  const segments = d.split("M").slice(1)
-  for (const seg of segments) {
-    const points = seg
-      .split("L")
-      .map((p) => p.trim())
-      .filter(Boolean)
-      .map((p) => p.split(/[, ]+/).map(Number))
-    if (points.length === 0) continue
-    path.moveTo(points[0][0] * unitsPerEm, (1 - points[0][1]) * unitsPerEm)
-    for (let i = 1; i < points.length; i++) {
-      path.lineTo(points[i][0] * unitsPerEm, (1 - points[i][1]) * unitsPerEm)
+  const commands = parseSVG(d)
+  for (const cmd of commands) {
+    switch (cmd.code) {
+      case "M":
+        path.moveTo(cmd.x * unitsPerEm, (1 - cmd.y) * unitsPerEm)
+        break
+      case "L":
+        path.lineTo(cmd.x * unitsPerEm, (1 - cmd.y) * unitsPerEm)
+        break
+      case "C":
+        path.curveTo(
+          cmd.x1 * unitsPerEm,
+          (1 - cmd.y1) * unitsPerEm,
+          cmd.x2 * unitsPerEm,
+          (1 - cmd.y2) * unitsPerEm,
+          cmd.x * unitsPerEm,
+          (1 - cmd.y) * unitsPerEm,
+        )
+        break
+      case "Q":
+        path.quadraticCurveTo(
+          cmd.x1 * unitsPerEm,
+          (1 - cmd.y1) * unitsPerEm,
+          cmd.x * unitsPerEm,
+          (1 - cmd.y) * unitsPerEm,
+        )
+        break
+      case "Z":
+        path.close()
+        break
     }
   }
   return path

@@ -57,6 +57,12 @@ export const svgAlphabet = {
   '"': "M 0.25 0 L 0.25 0.5 M 0.75 0 L 0.75 0.5",
 }
 
+for (const key of Object.keys(svgAlphabet)) {
+  if (/^[A-Z]$/.test(key)) {
+    svgAlphabet[key.toLowerCase()] = svgAlphabet[key as keyof typeof svgAlphabet]
+  }
+}
+
 export const lineAlphabet: Record<
   string,
   Array<{ x1: number; y1: number; x2: number; y2: number }>
