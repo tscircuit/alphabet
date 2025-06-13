@@ -9,6 +9,7 @@ A TypeScript library that provides SVG path data and line segments for rendering
 - Normalized coordinates (all paths fit in [0,1] x [0,1] bounds)
 - Line segment representation for each character
 - Duplicate stroke lines are removed so each path has only one line per stroke
+- SVG snapshots render characters with a very thin `stroke-width` (0.005)
 
 ## Installation
 

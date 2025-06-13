@@ -42,7 +42,7 @@ describe("SVG Character Snapshots", () => {
       const translateY = rowIndex * effectiveCellHeight + margin / 2
 
       pathElements.push(
-        `  <path d="${charPath}" transform="translate(${translateX.toFixed(3)}, ${translateY.toFixed(3)})" stroke="black" stroke-width="0.02" fill="none" stroke-linecap="round" stroke-linejoin="round" />`,
+        `  <path d="${charPath}" transform="translate(${translateX.toFixed(3)}, ${translateY.toFixed(3)})" stroke="black" stroke-width="0.005" fill="none" stroke-linecap="round" stroke-linejoin="round" />`,
       )
     }
 
