@@ -4,10 +4,10 @@ A TypeScript library that provides SVG path data and line segments for rendering
 
 ## Features
 
-- SVG path data for letters A-Z, numbers 0-9, and common symbols
+- SVG path data generated with **Fontkit** from the DejaVu Sans font
+- Includes digits, uppercase and lowercase letters, and punctuation symbols
 - Normalized coordinates (all paths fit in [0,1] x [0,1] bounds)
 - Line segment representation for each character
-- Support for basic punctuation and mathematical symbols
 
 ## Installation
 
