@@ -28,6 +28,7 @@ for (let i = 0; i < run.glyphs.length; i++) {
   let currentY = 0
   let startX = 0
   let startY = 0
+  let lastSegment: string | null = null
 
   for (const cmd of glyph.path.commands) {
     switch (cmd.command) {
@@ -36,55 +37,66 @@ for (let i = 0; i < run.glyphs.length; i++) {
         currentY = cmd.args[1]
         startX = currentX
         startY = currentY
-        segments.push(
-          `M${((currentX - minX) / width).toFixed(3)} ${(
+        {
+          const seg = `M${((currentX - minX) / width).toFixed(3)} ${(
             (maxY - currentY) /
             height
-          ).toFixed(3)}`,
-        )
+          ).toFixed(3)}`
+          if (seg !== lastSegment) {
+            segments.push(seg)
+            lastSegment = seg
+          }
+        }
         break
       case "lineTo":
         currentX = cmd.args[0]
         currentY = cmd.args[1]
-        segments.push(
-          `L${((currentX - minX) / width).toFixed(3)} ${(
+        {
+          const seg = `L${((currentX - minX) / width).toFixed(3)} ${(
             (maxY - currentY) /
             height
-          ).toFixed(3)}`,
-        )
+          ).toFixed(3)}`
+          if (seg !== lastSegment) {
+            segments.push(seg)
+            lastSegment = seg
+          }
+        }
         break
       case "quadraticCurveTo":
         // Approximate quadratic curves with a straight line to the end point
         currentX = cmd.args[2]
         currentY = cmd.args[3]
-        segments.push(
-          `L${((currentX - minX) / width).toFixed(3)} ${(
+        {
+          const seg = `L${((currentX - minX) / width).toFixed(3)} ${(
             (maxY - currentY) /
             height
-          ).toFixed(3)}`,
-        )
+          ).toFixed(3)}`
+          if (seg !== lastSegment) {
+            segments.push(seg)
+            lastSegment = seg
+          }
+        }
         break
       case "bezierCurveTo":
         // Approximate cubic curves with a straight line to the end point
         currentX = cmd.args[4]
         currentY = cmd.args[5]
-        segments.push(
-          `L${((currentX - minX) / width).toFixed(3)} ${(
+        {
+          const seg = `L${((currentX - minX) / width).toFixed(3)} ${(
             (maxY - currentY) /
             height
-          ).toFixed(3)}`,
-        )
+          ).toFixed(3)}`
+          if (seg !== lastSegment) {
+            segments.push(seg)
+            lastSegment = seg
+          }
+        }
         break
       case "closePath":
-        segments.push(
-          `L${((startX - minX) / width).toFixed(3)} ${(
-            (maxY - startY) /
-            height
-          ).toFixed(3)}`,
-        )
+        // Ignore the closing segment to avoid drawing strokes twice
         break
     }
   }
-  // Remove successive duplicate move commands
+  // Segments are deduplicated as they are generated
   fontkitAlphabet[char] = segments.join("")
 }
