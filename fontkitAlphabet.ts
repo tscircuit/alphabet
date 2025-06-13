@@ -24,6 +24,7 @@ for (let i = 0; i < run.glyphs.length; i++) {
   const height = maxY - minY || 1
 
   const segments: string[] = []
+  const seenSegments = new Set<string>()
   let currentX = 0
   let currentY = 0
   let startX = 0
@@ -42,8 +43,9 @@ for (let i = 0; i < run.glyphs.length; i++) {
             (maxY - currentY) /
             height
           ).toFixed(3)}`
-          if (seg !== lastSegment) {
+          if (seg !== lastSegment && !seenSegments.has(seg)) {
             segments.push(seg)
+            seenSegments.add(seg)
             lastSegment = seg
           }
         }
@@ -56,8 +58,9 @@ for (let i = 0; i < run.glyphs.length; i++) {
             (maxY - currentY) /
             height
           ).toFixed(3)}`
-          if (seg !== lastSegment) {
+          if (seg !== lastSegment && !seenSegments.has(seg)) {
             segments.push(seg)
+            seenSegments.add(seg)
             lastSegment = seg
           }
         }
@@ -71,8 +74,9 @@ for (let i = 0; i < run.glyphs.length; i++) {
             (maxY - currentY) /
             height
           ).toFixed(3)}`
-          if (seg !== lastSegment) {
+          if (seg !== lastSegment && !seenSegments.has(seg)) {
             segments.push(seg)
+            seenSegments.add(seg)
             lastSegment = seg
           }
         }
@@ -86,8 +90,9 @@ for (let i = 0; i < run.glyphs.length; i++) {
             (maxY - currentY) /
             height
           ).toFixed(3)}`
-          if (seg !== lastSegment) {
+          if (seg !== lastSegment && !seenSegments.has(seg)) {
             segments.push(seg)
+            seenSegments.add(seg)
             lastSegment = seg
           }
         }
@@ -97,6 +102,6 @@ for (let i = 0; i < run.glyphs.length; i++) {
         break
     }
   }
-  // Segments are deduplicated as they are generated
+  // Deduplicate segments so each stroke is drawn only once
   fontkitAlphabet[char] = segments.join("")
 }
