@@ -57,9 +57,47 @@ export const svgAlphabet = {
   '"': "M 0.25 0 L 0.25 0.5 M 0.75 0 L 0.75 0.5",
 }
 
+import { parseSVG } from "svg-path-parser"
+
+function upperToLowerPath(d: string): string {
+  const scale = 0.8
+  const dx = (1 - scale) / 2
+  const cmds = parseSVG(d)
+  const parts: string[] = []
+  function cx(x: number) {
+    return (x * scale + dx).toFixed(3)
+  }
+  function cy(y: number) {
+    return (y * scale).toFixed(3)
+  }
+  for (const c of cmds) {
+    switch (c.code) {
+      case "M":
+        parts.push(`M${cx(c.x)} ${cy(c.y)}`)
+        break
+      case "L":
+        parts.push(`L${cx(c.x)} ${cy(c.y)}`)
+        break
+      case "C":
+        parts.push(
+          `C${cx(c.x1)} ${cy(c.y1)} ${cx(c.x2)} ${cy(c.y2)} ${cx(c.x)} ${cy(c.y)}`,
+        )
+        break
+      case "Q":
+        parts.push(`Q${cx(c.x1)} ${cy(c.y1)} ${cx(c.x)} ${cy(c.y)}`)
+        break
+      case "Z":
+        parts.push("Z")
+        break
+    }
+  }
+  return parts.join("")
+}
+
 for (const key of Object.keys(svgAlphabet)) {
   if (/^[A-Z]$/.test(key)) {
-    svgAlphabet[key.toLowerCase()] = svgAlphabet[key as keyof typeof svgAlphabet]
+    const upper = svgAlphabet[key as keyof typeof svgAlphabet]
+    svgAlphabet[key.toLowerCase()] = upperToLowerPath(upper)
   }
 }
 
