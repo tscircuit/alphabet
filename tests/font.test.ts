@@ -1,9 +1,9 @@
 import { expect, test, describe } from "bun:test"
-import { svgAlphabet } from "../index"
 import opentype from "opentype.js"
 import { buildFont, unitsPerEm } from "../generateFont"
 
 const font = buildFont()
+const characters = Array.from("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
 
 function glyphToPathData(glyph: opentype.Glyph): string {
   let d = ""
@@ -21,7 +21,6 @@ function glyphToPathData(glyph: opentype.Glyph): string {
 
 describe("Alphabet Font SVG", () => {
   test("generates svg snapshot from font", async () => {
-    const characters = Object.keys(svgAlphabet).sort()
     const numChars = characters.length
 
     if (numChars === 0) {

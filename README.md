@@ -2,7 +2,7 @@
 
 A TypeScript library that provides SVG path data and line segments for rendering letters, numbers and basic symbols. Each character is normalized to fit within a 1x1 unit square.
 
-A font can be generated from these paths using [opentype.js](https://github.com/opentypejs/opentype.js). The provided `generateFont.ts` script constructs the font in memory and can write `alphabet.otf` when run directly.
+A font can be generated using [opentype.js](https://github.com/opentypejs/opentype.js). The `generateFont.ts` script parses a subset of SourceSansPro to build the font in memory and can write `alphabet.otf` when run directly.
 ## Features
 
 - SVG path data for letters A-Z, numbers 0-9, and common symbols
