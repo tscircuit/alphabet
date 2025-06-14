@@ -21,7 +21,7 @@ function quad(p0: number, p1: number, p2: number, t: number) {
 }
 function flattenGlyph(glyph: opentype.Glyph): opentype.Path {
   const path = new opentype.Path();
-  const cmds = glyph.getPath().commands;
+  const cmds = glyph.getPath(0, 0, unitsPerEm).commands;
   let prevX = 0;
   let prevY = 0;
   let started = false;

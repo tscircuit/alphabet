@@ -1,6 +1,6 @@
 import { expect, test, describe } from "bun:test"
 import opentype from "opentype.js"
-import { buildFont, unitsPerEm } from "../generateFont"
+import { buildFont } from "../generateFont"
 
 const font = buildFont()
 const characters = Array.from("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
@@ -11,10 +11,21 @@ function glyphToPathData(glyph: opentype.Glyph): string {
   let prevY = 0
   let started = false
 
+  const box = glyph.getBoundingBox()
+  const width = box.x2 - box.x1
+  const height = box.y2 - box.y1
+  const scale = 1 / Math.max(width, height)
+
+  function normX(x: number) {
+    return ((x - box.x1) * scale).toFixed(3)
+  }
+
+  function normY(y: number) {
+    return (1 - (y - box.y1) * scale).toFixed(3)
+  }
+
   function addLine(x: number, y: number) {
-    const nx = (x / unitsPerEm).toFixed(3)
-    const ny = (1 - y / unitsPerEm).toFixed(3)
-    d += `${started ? "L" : "M"}${nx} ${ny}`
+    d += `${started ? "L" : "M"}${normX(x)} ${normY(y)}`
     started = true
   }
 
