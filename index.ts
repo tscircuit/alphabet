@@ -57,9 +57,21 @@ export const svgAlphabet = {
   '"': "M 0.25 0 L 0.25 0.5 M 0.75 0 L 0.75 0.5",
 }
 
-// Add lowercase letters by reusing the uppercase paths
+// Utility to transform an SVG path by scaling and translating coordinates
+const transformPath = (
+  path: string,
+  scale = 1,
+  offsetX = 0,
+  offsetY = 0,
+) =>
+  path.replace(/([0-9.]+) ([0-9.]+)/g, (_, x, y) =>
+    `${(+x * scale + offsetX).toFixed(3)} ${(+y * scale + offsetY).toFixed(3)}`,
+  )
+
+// Add lowercase letters by creating slightly smaller variants of the uppercase
 for (const letter of "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
-  svgAlphabet[letter.toLowerCase()] = svgAlphabet[letter]
+  const upperPath = svgAlphabet[letter]
+  svgAlphabet[letter.toLowerCase()] = transformPath(upperPath, 0.8, 0.1, 0.1)
 }
 
 export const lineAlphabet: Record<
