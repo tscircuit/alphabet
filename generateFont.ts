@@ -1,22 +1,74 @@
 import opentype from "opentype.js";
 import { writeFileSync } from "fs";
-import { lineAlphabet } from "./index";
+import { sourceSansProRegularBase64 } from "./fontData";
 
-export const unitsPerEm = 1000;
+const baseFont = opentype.parse(Buffer.from(sourceSansProRegularBase64, "base64").buffer);
+export const unitsPerEm = baseFont.unitsPerEm;
 
-function buildGlyph(char: string): opentype.Glyph {
-  const segments = lineAlphabet[char];
+function cubic(p0: number, p1: number, p2: number, p3: number, t: number) {
+  const mt = 1 - t;
+  return (
+    mt * mt * mt * p0 +
+    3 * mt * mt * t * p1 +
+    3 * mt * t * t * p2 +
+    t * t * t * p3
+  );
+}
+
+function quad(p0: number, p1: number, p2: number, t: number) {
+  const mt = 1 - t;
+  return mt * mt * p0 + 2 * mt * t * p1 + t * t * p2;
+}
+function flattenGlyph(glyph: opentype.Glyph): opentype.Path {
   const path = new opentype.Path();
-  if (segments && segments.length > 0) {
-    const first = segments[0];
-    path.moveTo(first.x1 * unitsPerEm, first.y1 * unitsPerEm);
-    path.lineTo(first.x2 * unitsPerEm, first.y2 * unitsPerEm);
-    for (let i = 1; i < segments.length; i++) {
-      const seg = segments[i];
-      path.lineTo(seg.x1 * unitsPerEm, seg.y1 * unitsPerEm);
-      path.lineTo(seg.x2 * unitsPerEm, seg.y2 * unitsPerEm);
+  const cmds = glyph.getPath().commands;
+  let prevX = 0;
+  let prevY = 0;
+  let started = false;
+
+  const add = (x: number, y: number) => {
+    if (!started) {
+      path.moveTo(x, y);
+      started = true;
+    } else {
+      path.lineTo(x, y);
+    }
+  };
+
+  for (const cmd of cmds) {
+    if (cmd.type === "M") {
+      add(cmd.x, cmd.y);
+      prevX = cmd.x;
+      prevY = cmd.y;
+    } else if (cmd.type === "L") {
+      add(cmd.x, cmd.y);
+      prevX = cmd.x;
+      prevY = cmd.y;
+    } else if (cmd.type === "C") {
+      for (let t = 0.1; t <= 1; t += 0.1) {
+        add(
+          cubic(prevX, cmd.x1, cmd.x2, cmd.x, t),
+          cubic(prevY, cmd.y1, cmd.y2, cmd.y, t),
+        );
+      }
+      prevX = cmd.x;
+      prevY = cmd.y;
+    } else if (cmd.type === "Q") {
+      for (let t = 0.1; t <= 1; t += 0.1) {
+        add(quad(prevX, cmd.x1, cmd.x, t), quad(prevY, cmd.y1, cmd.y, t));
+      }
+      prevX = cmd.x;
+      prevY = cmd.y;
+    } else if (cmd.type === "Z") {
+      // ignore close
     }
   }
+  return path;
+}
+
+function buildGlyph(char: string): opentype.Glyph {
+  const srcGlyph = baseFont.charToGlyph(char);
+  const path = flattenGlyph(srcGlyph);
   return new opentype.Glyph({
     name: char,
     unicode: char.charCodeAt(0),
@@ -27,15 +79,16 @@ function buildGlyph(char: string): opentype.Glyph {
 
 export function buildFont(): opentype.Font {
   const glyphs: opentype.Glyph[] = [];
-  for (const char of Object.keys(lineAlphabet)) {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+  for (const char of chars) {
     glyphs.push(buildGlyph(char));
   }
   return new opentype.Font({
     familyName: "Alphabet",
     styleName: "Regular",
     unitsPerEm,
-    ascender: unitsPerEm,
-    descender: 0,
+    ascender: baseFont.ascender,
+    descender: baseFont.descender,
     glyphs,
   });
 }
