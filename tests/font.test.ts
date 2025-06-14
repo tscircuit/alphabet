@@ -7,13 +7,61 @@ const characters = Array.from("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvw
 
 function glyphToPathData(glyph: opentype.Glyph): string {
   let d = ""
+  let prevX = 0
+  let prevY = 0
+  let started = false
+
+  function addLine(x: number, y: number) {
+    const nx = (x / unitsPerEm).toFixed(3)
+    const ny = (1 - y / unitsPerEm).toFixed(3)
+    d += `${started ? "L" : "M"}${nx} ${ny}`
+    started = true
+  }
+
+  function cubic(p0: number, p1: number, p2: number, p3: number, t: number) {
+    const mt = 1 - t
+    return (
+      mt * mt * mt * p0 +
+      3 * mt * mt * t * p1 +
+      3 * mt * t * t * p2 +
+      t * t * t * p3
+    )
+  }
+
+  function quad(p0: number, p1: number, p2: number, t: number) {
+    const mt = 1 - t
+    return mt * mt * p0 + 2 * mt * t * p1 + t * t * p2
+  }
+
   for (const cmd of glyph.path.commands) {
     if (cmd.type === "M") {
-      d += `M${(cmd.x / unitsPerEm).toFixed(3)} ${(1 - cmd.y / unitsPerEm).toFixed(3)}`
+      addLine(cmd.x, cmd.y)
+      prevX = cmd.x
+      prevY = cmd.y
     } else if (cmd.type === "L") {
-      d += `L${(cmd.x / unitsPerEm).toFixed(3)} ${(1 - cmd.y / unitsPerEm).toFixed(3)}`
+      addLine(cmd.x, cmd.y)
+      prevX = cmd.x
+      prevY = cmd.y
+    } else if (cmd.type === "C") {
+      for (let t = 0.1; t <= 1; t += 0.1) {
+        addLine(
+          cubic(prevX, cmd.x1, cmd.x2, cmd.x, t),
+          cubic(prevY, cmd.y1, cmd.y2, cmd.y, t),
+        )
+      }
+      prevX = cmd.x
+      prevY = cmd.y
+    } else if (cmd.type === "Q") {
+      for (let t = 0.1; t <= 1; t += 0.1) {
+        addLine(
+          quad(prevX, cmd.x1, cmd.x, t),
+          quad(prevY, cmd.y1, cmd.y, t),
+        )
+      }
+      prevX = cmd.x
+      prevY = cmd.y
     } else if (cmd.type === "Z") {
-      d += "Z"
+      // Ignore close commands to keep a single stroke
     }
   }
   return d
