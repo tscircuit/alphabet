@@ -57,6 +57,11 @@ export const svgAlphabet = {
   '"': "M 0.25 0 L 0.25 0.5 M 0.75 0 L 0.75 0.5",
 }
 
+// Add lowercase letters by reusing the uppercase paths
+for (const letter of "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
+  svgAlphabet[letter.toLowerCase()] = svgAlphabet[letter]
+}
+
 export const lineAlphabet: Record<
   string,
   Array<{ x1: number; y1: number; x2: number; y2: number }>
