@@ -85,8 +85,9 @@ const font = new opentype.Font({
   glyphs,
 })
 
-const outputPath = join("TscircuitAlphabet.ttf")
+const outputPath = join("dist", "TscircuitAlphabet.ttf")
 mkdirSync(dirname(outputPath), { recursive: true })
 writeFileSync(outputPath, Buffer.from(font.toArrayBuffer()))
+writeFileSync("TscircuitAlphabet.ttf", Buffer.from(font.toArrayBuffer()))
 
 console.log(`Font written to ${outputPath}`)
