@@ -177,3 +177,5 @@ dist
 .aider*
 
 **/*.diff.png
+*.lock
+*.lockb
