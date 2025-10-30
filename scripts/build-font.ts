@@ -77,7 +77,7 @@ for (const [char, pathData] of Object.entries(svgAlphabet)) {
 glyphs.sort((a, b) => (a.unicode ?? 0) - (b.unicode ?? 0))
 
 const font = new opentype.Font({
-  familyName: "TSCircuitAlphabet",
+  familyName: "TscircuitAlphabet",
   styleName: "Regular",
   unitsPerEm: UNITS_PER_EM,
   ascender: ASCENDER,
@@ -85,7 +85,7 @@ const font = new opentype.Font({
   glyphs,
 })
 
-const outputPath = join("dist", "alphabet.ttf")
+const outputPath = join("TscircuitAlphabet.ttf")
 mkdirSync(dirname(outputPath), { recursive: true })
 writeFileSync(outputPath, Buffer.from(font.toArrayBuffer()))
 
