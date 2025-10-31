@@ -309,30 +309,40 @@ const font = new opentype.Font({
   glyphs,
 })
 
-// Update key metric tables for monospace fonts when available
-try {
-  const anyFont: any = font as any
-  if (anyFont.tables && anyFont.tables.hhea) {
-    anyFont.tables.hhea.ascent = ASCENDER
-    anyFont.tables.hhea.descent = DESCENDER
-    anyFont.tables.hhea.lineGap = 0
-    anyFont.tables.hhea.advanceWidthMax = Math.round(MONOSPACE_WIDTH)
-  }
-  if (anyFont.tables && anyFont.tables.os2) {
-    anyFont.tables.os2.sTypoAscender = ASCENDER
-    anyFont.tables.os2.sTypoDescender = DESCENDER
-    anyFont.tables.os2.sTypoLineGap = 0
-    anyFont.tables.os2.usWinAscent = ASCENDER
-    anyFont.tables.os2.usWinDescent = -DESCENDER
-    anyFont.tables.os2.xAvgCharWidth = Math.round(MONOSPACE_WIDTH)
-    anyFont.tables.os2.panose = anyFont.tables.os2.panose || {}
-    anyFont.tables.os2.panose.proportion = 9 // monospace
-  }
-  if (anyFont.tables && anyFont.tables.post) {
-    anyFont.tables.post.isFixedPitch = 1
-  }
-} catch (err) {
-  console.warn("Warning updating font metric tables:", err)
+// Update key metric tables for monospace fonts when available (narrow types, no `any`)
+type HheaTable = { ascent?: number; descent?: number; lineGap?: number; advanceWidthMax?: number }
+type OS2Table = {
+  sTypoAscender?: number
+  sTypoDescender?: number
+  sTypoLineGap?: number
+  usWinAscent?: number
+  usWinDescent?: number
+  xAvgCharWidth?: number
+  panose?: { proportion?: number } | undefined
+}
+type PostTable = { isFixedPitch?: number }
+type FontTables = { hhea?: HheaTable; os2?: OS2Table; post?: PostTable }
+type FontWithTables = { tables?: FontTables }
+
+const tables = (font as unknown as FontWithTables).tables
+if (tables?.hhea) {
+  tables.hhea.ascent = ASCENDER
+  tables.hhea.descent = DESCENDER
+  tables.hhea.lineGap = 0
+  tables.hhea.advanceWidthMax = Math.round(MONOSPACE_WIDTH)
+}
+if (tables?.os2) {
+  tables.os2.sTypoAscender = ASCENDER
+  tables.os2.sTypoDescender = DESCENDER
+  tables.os2.sTypoLineGap = 0
+  tables.os2.usWinAscent = ASCENDER
+  tables.os2.usWinDescent = -DESCENDER
+  tables.os2.xAvgCharWidth = Math.round(MONOSPACE_WIDTH)
+  tables.os2.panose = tables.os2.panose ?? {}
+  tables.os2.panose.proportion = 9 // monospace
+}
+if (tables?.post) {
+  tables.post.isFixedPitch = 1
 }
 
 const outputPath = join("dist", "TscircuitAlphabet.ttf")
