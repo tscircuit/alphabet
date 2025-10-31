@@ -9,7 +9,7 @@ const UNITS_PER_EM = 1000
 // Match Arial's proportions: ascender at ~90.5% and descender at ~21.2% of em
 const ASCENDER = 905
 const DESCENDER = -212
-const STROKE_WIDTH = 0.16 // Adjust this to make the font thicker or thinner
+const STROKE_WIDTH = 0.12  // Adjust this to make the font thicker or thinner
 const SIDE_BEARING_PERCENT = 0.1 // 10% of glyph width on each side
 
 interface Point {
@@ -150,10 +150,54 @@ const polygonToPath = (polygons: Point[][]): opentype.Path => {
   return path
 }
 
+// Translate an opentype.js path by (dx, dy) in font units (typed, no `any`)
+type MutableCommand = { x?: number; y?: number; x1?: number; y1?: number; x2?: number; y2?: number }
+const translatePath = (path: opentype.Path, dx: number, dy: number): void => {
+  for (const cmd of path.commands as unknown as MutableCommand[]) {
+    if (typeof cmd.x === "number") cmd.x += dx
+    if (typeof cmd.y === "number") cmd.y += dy
+    if (typeof cmd.x1 === "number") cmd.x1 += dx
+    if (typeof cmd.y1 === "number") cmd.y1 += dy
+    if (typeof cmd.x2 === "number") cmd.x2 += dx
+    if (typeof cmd.y2 === "number") cmd.y2 += dy
+  }
+}
+
+// Measure minimum Y of an opentype path in font units (typed, no `any`)
+const getPathMinY = (path: opentype.Path): number => {
+  let minY = Number.POSITIVE_INFINITY
+  for (const cmd of path.commands as unknown as MutableCommand[]) {
+    if (typeof cmd.y === "number") minY = Math.min(minY, cmd.y)
+    if (typeof cmd.y1 === "number") minY = Math.min(minY, cmd.y1)
+    if (typeof cmd.y2 === "number") minY = Math.min(minY, cmd.y2)
+  }
+  return minY
+}
+
 const createGlyphPath = (
   pathData: string,
+  normalizeBaseline: boolean,
 ): { path: opentype.Path; bbox: ReturnType<typeof getBoundingBox> } => {
   const lines = parsePathToSegments(pathData)
+
+  if (normalizeBaseline) {
+    // Find minimum Y across all line points (normalized coords)
+    let minY = Number.POSITIVE_INFINITY
+    for (const line of lines) {
+      for (const p of line) {
+        minY = Math.min(minY, p.y)
+      }
+    }
+    if (Number.isFinite(minY)) {
+      // Shift so stroked outline (with radius = STROKE_WIDTH/2) sits on baseline
+      const dy = -minY + STROKE_WIDTH / 2
+      for (const line of lines) {
+        for (const p of line) {
+          p.y += dy
+        }
+      }
+    }
+  }
   const allPolygons: Point[][] = []
 
   // Expand each line segment into a capsule with rounded caps
@@ -216,6 +260,8 @@ const glyphData: Array<{
 
 let maxGlyphWidth = 0
 
+const DESCENDERS = new Set(["g", "j", "p", "q", "y", ","])
+
 for (const [char, pathData] of Object.entries(svgAlphabet)) {
   if (!char) {
     continue
@@ -227,7 +273,7 @@ for (const [char, pathData] of Object.entries(svgAlphabet)) {
     continue
   }
 
-  const { path, bbox } = createGlyphPath(pathData)
+  const { path, bbox } = createGlyphPath(pathData, !DESCENDERS.has(char))
   const glyphWidth = (bbox.maxX - bbox.minX) * UNITS_PER_EM
 
   maxGlyphWidth = Math.max(maxGlyphWidth, glyphWidth)
@@ -253,6 +299,14 @@ for (const { char, codePoint, path, bbox, glyphWidth } of glyphData) {
   const leftSideBearing =
     (MONOSPACE_WIDTH - glyphWidth) / 2 - bbox.minX * UNITS_PER_EM
 
+  // Ensure descenders drop to the configured DESCENDER depth
+  if (DESCENDERS.has(char)) {
+    const currentMinY = getPathMinY(path)
+    const desiredMinY = DESCENDER // negative value in font units
+    const delta = desiredMinY - currentMinY
+    if (Number.isFinite(delta) && delta !== 0) translatePath(path, 0, delta)
+  }
+
   glyphs.push(
     new opentype.Glyph({
       name: char,
@@ -274,6 +328,41 @@ const font = new opentype.Font({
   descender: DESCENDER,
   glyphs,
 })
+
+type HheaTable = { ascent?: number; descent?: number; lineGap?: number; advanceWidthMax?: number }
+type OS2Table = {
+  sTypoAscender?: number
+  sTypoDescender?: number
+  sTypoLineGap?: number
+  usWinAscent?: number
+  usWinDescent?: number
+  xAvgCharWidth?: number
+  panose?: { proportion?: number } | undefined
+}
+type PostTable = { isFixedPitch?: number }
+type FontTables = { hhea?: HheaTable; os2?: OS2Table; post?: PostTable }
+type FontWithTables = { tables?: FontTables }
+
+const tables = (font as unknown as FontWithTables).tables
+if (tables?.hhea) {
+  tables.hhea.ascent = ASCENDER
+  tables.hhea.descent = DESCENDER
+  tables.hhea.lineGap = 0
+  tables.hhea.advanceWidthMax = Math.round(MONOSPACE_WIDTH)
+}
+if (tables?.os2) {
+  tables.os2.sTypoAscender = ASCENDER
+  tables.os2.sTypoDescender = DESCENDER
+  tables.os2.sTypoLineGap = 0
+  tables.os2.usWinAscent = ASCENDER
+  tables.os2.usWinDescent = -DESCENDER
+  tables.os2.xAvgCharWidth = Math.round(MONOSPACE_WIDTH)
+  tables.os2.panose = tables.os2.panose ?? {}
+  tables.os2.panose.proportion = 9 // monospace
+}
+if (tables?.post) {
+  tables.post.isFixedPitch = 1
+}
 
 const outputPath = join("dist", "TscircuitAlphabet.ttf")
 mkdirSync(dirname(outputPath), { recursive: true })
