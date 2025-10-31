@@ -164,8 +164,28 @@ const translatePath = (path: opentype.Path, dx: number, dy: number): void => {
 
 const createGlyphPath = (
   pathData: string,
+  normalizeBaseline: boolean,
 ): { path: opentype.Path; bbox: ReturnType<typeof getBoundingBox> } => {
   const lines = parsePathToSegments(pathData)
+
+  if (normalizeBaseline) {
+    // Find minimum Y across all line points (normalized coords)
+    let minY = Number.POSITIVE_INFINITY
+    for (const line of lines) {
+      for (const p of line) {
+        minY = Math.min(minY, p.y)
+      }
+    }
+    if (Number.isFinite(minY)) {
+      // Shift so stroked outline (with radius = STROKE_WIDTH/2) sits on baseline
+      const dy = -minY + STROKE_WIDTH / 2
+      for (const line of lines) {
+        for (const p of line) {
+          p.y += dy
+        }
+      }
+    }
+  }
   const allPolygons: Point[][] = []
 
   // Expand each line segment into a capsule with rounded caps
@@ -228,6 +248,8 @@ const glyphData: Array<{
 
 let maxGlyphWidth = 0
 
+const DESCENDERS = new Set(["g", "j", "p", "q", "y", ","])
+
 for (const [char, pathData] of Object.entries(svgAlphabet)) {
   if (!char) {
     continue
@@ -239,7 +261,7 @@ for (const [char, pathData] of Object.entries(svgAlphabet)) {
     continue
   }
 
-  const { path, bbox } = createGlyphPath(pathData)
+  const { path, bbox } = createGlyphPath(pathData, !DESCENDERS.has(char))
   const glyphWidth = (bbox.maxX - bbox.minX) * UNITS_PER_EM
 
   maxGlyphWidth = Math.max(maxGlyphWidth, glyphWidth)
@@ -264,19 +286,6 @@ for (const { char, codePoint, path, bbox, glyphWidth } of glyphData) {
   // Center the glyph within the monospace width
   const leftSideBearing =
     (MONOSPACE_WIDTH - glyphWidth) / 2 - bbox.minX * UNITS_PER_EM
-  // Align baseline for non-descenders
-  const hasDescender = new Set(["g", "j", "p", "q", "y", ","]).has(char)
-  if (!hasDescender) {
-    // Compute actual path minY in font units to account for stroke caps
-    let pathMinY = Number.POSITIVE_INFINITY
-    for (const cmd of path.commands) {
-      if ((cmd as any).y !== undefined) pathMinY = Math.min(pathMinY, (cmd as any).y)
-      if ((cmd as any).y1 !== undefined) pathMinY = Math.min(pathMinY, (cmd as any).y1)
-      if ((cmd as any).y2 !== undefined) pathMinY = Math.min(pathMinY, (cmd as any).y2)
-    }
-    const yShift = -pathMinY
-    if (Number.isFinite(yShift) && yShift !== 0) translatePath(path, 0, yShift)
-  }
 
   glyphs.push(
     new opentype.Glyph({
