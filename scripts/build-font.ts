@@ -163,13 +163,13 @@ const translatePath = (path: opentype.Path, dx: number, dy: number): void => {
   }
 }
 
-// Measure minimum Y of an opentype path in font units
+// Measure minimum Y of an opentype path in font units (typed, no `any`)
 const getPathMinY = (path: opentype.Path): number => {
   let minY = Number.POSITIVE_INFINITY
-  for (const cmd of path.commands) {
-    if ((cmd as any).y !== undefined) minY = Math.min(minY, (cmd as any).y)
-    if ((cmd as any).y1 !== undefined) minY = Math.min(minY, (cmd as any).y1)
-    if ((cmd as any).y2 !== undefined) minY = Math.min(minY, (cmd as any).y2)
+  for (const cmd of path.commands as unknown as MutableCommand[]) {
+    if (typeof cmd.y === "number") minY = Math.min(minY, cmd.y)
+    if (typeof cmd.y1 === "number") minY = Math.min(minY, cmd.y1)
+    if (typeof cmd.y2 === "number") minY = Math.min(minY, cmd.y2)
   }
   return minY
 }
