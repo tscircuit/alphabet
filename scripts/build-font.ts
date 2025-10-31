@@ -6,8 +6,9 @@ import { Polygon, BooleanOperations } from "@flatten-js/core"
 import { svgAlphabet } from "../index.ts"
 
 const UNITS_PER_EM = 1000
-const ASCENDER = UNITS_PER_EM
-const DESCENDER = 0
+// Match Arial's proportions: ascender at ~90.5% and descender at ~21.2% of em
+const ASCENDER = 905
+const DESCENDER = -212
 const STROKE_WIDTH = 0.16 // Adjust this to make the font thicker or thinner
 const SIDE_BEARING_PERCENT = 0.1 // 10% of glyph width on each side
 
@@ -128,6 +129,7 @@ const getBoundingBox = (
 }
 
 // Convert polygon points to opentype.js path
+// Scale to match the ascender height (glyphs go from baseline 0 to ascender)
 const polygonToPath = (polygons: Point[][]): opentype.Path => {
   const path = new opentype.Path()
 
@@ -135,11 +137,11 @@ const polygonToPath = (polygons: Point[][]): opentype.Path => {
     if (polygon.length === 0) continue
 
     const first = polygon[0]
-    path.moveTo(first.x * UNITS_PER_EM, first.y * UNITS_PER_EM)
+    path.moveTo(first.x * UNITS_PER_EM, first.y * ASCENDER)
 
     for (let i = 1; i < polygon.length; i++) {
       const pt = polygon[i]
-      path.lineTo(pt.x * UNITS_PER_EM, pt.y * UNITS_PER_EM)
+      path.lineTo(pt.x * UNITS_PER_EM, pt.y * ASCENDER)
     }
 
     path.closePath()
