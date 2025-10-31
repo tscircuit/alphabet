@@ -1,7 +1,10 @@
 {
   "name": "@tscircuit/alphabet",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
   "devDependencies": {
     "@biomejs/biome": "1.7.3",
     "@flatten-js/core": "^1.6.6",
