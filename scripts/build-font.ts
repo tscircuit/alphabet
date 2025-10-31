@@ -8,7 +8,8 @@ import { svgAlphabet } from "../index.ts"
 const UNITS_PER_EM = 1000
 const ASCENDER = UNITS_PER_EM
 const DESCENDER = 0
-const STROKE_WIDTH = 0.05 // Adjust this to make the font thicker or thinner
+const STROKE_WIDTH = 0.16 // Adjust this to make the font thicker or thinner
+const SIDE_BEARING_PERCENT = 0.1 // 10% of glyph width on each side
 
 interface Point {
   x: number
@@ -57,29 +58,73 @@ const parsePathToSegments = (pathData: string): Point[][] => {
   return lines
 }
 
-// Create a rectangle polygon around a line segment
-const expandLineSegment = (
-  p1: Point,
-  p2: Point,
-  width: number,
-): Point[] => {
+// Create a capsule shape (rectangle with rounded ends) for a line segment
+const expandLineSegment = (p1: Point, p2: Point, width: number, segments = 8): Point[] => {
   const dx = p2.x - p1.x
   const dy = p2.y - p1.y
   const len = Math.sqrt(dx * dx + dy * dy)
 
   if (len === 0) return []
 
-  // Perpendicular unit vector
-  const perpX = (-dy / len) * (width / 2)
-  const perpY = (dx / len) * (width / 2)
+  const radius = width / 2
 
-  // Create a rectangle around the line
-  return [
-    { x: p1.x + perpX, y: p1.y + perpY },
-    { x: p2.x + perpX, y: p2.y + perpY },
-    { x: p2.x - perpX, y: p2.y - perpY },
-    { x: p1.x - perpX, y: p1.y - perpY },
-  ]
+  // Perpendicular unit vector
+  const perpX = (-dy / len) * radius
+  const perpY = (dx / len) * radius
+
+  // Calculate the angle of the line
+  const lineAngle = Math.atan2(dy, dx)
+
+  const points: Point[] = []
+
+  // Side 1: from p1 to p2 (offset in perpendicular direction)
+  points.push({ x: p1.x + perpX, y: p1.y + perpY })
+  points.push({ x: p2.x + perpX, y: p2.y + perpY })
+
+  // Semicircle around p2 (from +perp to -perp)
+  for (let i = 1; i < segments; i++) {
+    const angle = lineAngle + Math.PI / 2 - (i / segments) * Math.PI
+    points.push({
+      x: p2.x + Math.cos(angle) * radius,
+      y: p2.y + Math.sin(angle) * radius,
+    })
+  }
+
+  // Side 2: from p2 to p1 (offset in opposite perpendicular direction)
+  points.push({ x: p2.x - perpX, y: p2.y - perpY })
+  points.push({ x: p1.x - perpX, y: p1.y - perpY })
+
+  // Semicircle around p1 (from -perp to +perp)
+  for (let i = 1; i < segments; i++) {
+    const angle = lineAngle - Math.PI / 2 - (i / segments) * Math.PI
+    points.push({
+      x: p1.x + Math.cos(angle) * radius,
+      y: p1.y + Math.sin(angle) * radius,
+    })
+  }
+
+  return points
+}
+
+// Calculate bounding box of polygons in normalized coordinates
+const getBoundingBox = (
+  polygons: Point[][],
+): { minX: number; maxX: number; minY: number; maxY: number } => {
+  let minX = Number.POSITIVE_INFINITY
+  let maxX = Number.NEGATIVE_INFINITY
+  let minY = Number.POSITIVE_INFINITY
+  let maxY = Number.NEGATIVE_INFINITY
+
+  for (const polygon of polygons) {
+    for (const point of polygon) {
+      minX = Math.min(minX, point.x)
+      maxX = Math.max(maxX, point.x)
+      minY = Math.min(minY, point.y)
+      maxY = Math.max(maxY, point.y)
+    }
+  }
+
+  return { minX, maxX, minY, maxY }
 }
 
 // Convert polygon points to opentype.js path
@@ -103,16 +148,18 @@ const polygonToPath = (polygons: Point[][]): opentype.Path => {
   return path
 }
 
-const createGlyphPath = (pathData: string) => {
+const createGlyphPath = (
+  pathData: string,
+): { path: opentype.Path; bbox: ReturnType<typeof getBoundingBox> } => {
   const lines = parsePathToSegments(pathData)
   const allPolygons: Point[][] = []
 
-  // Expand each line segment into a polygon
+  // Expand each line segment into a capsule with rounded caps
   for (const line of lines) {
     for (let i = 0; i < line.length - 1; i++) {
-      const rect = expandLineSegment(line[i], line[i + 1], STROKE_WIDTH)
-      if (rect.length > 0) {
-        allPolygons.push(rect)
+      const capsule = expandLineSegment(line[i], line[i + 1], STROKE_WIDTH)
+      if (capsule.length > 0) {
+        allPolygons.push(capsule)
       }
     }
   }
@@ -120,11 +167,16 @@ const createGlyphPath = (pathData: string) => {
   // Use boolean union to merge overlapping polygons
   try {
     if (allPolygons.length === 0) {
-      return new opentype.Path()
+      return {
+        path: new opentype.Path(),
+        bbox: { minX: 0, maxX: 0, minY: 0, maxY: 0 },
+      }
     }
 
     // Create polygons
-    const polygons = allPolygons.map((pts) => new Polygon(pts.map((p) => [p.x, p.y])))
+    const polygons = allPolygons.map(
+      (pts) => new Polygon(pts.map((p) => [p.x, p.y])),
+    )
 
     // Union all polygons using BooleanOperations
     let unified = polygons[0]
@@ -142,21 +194,25 @@ const createGlyphPath = (pathData: string) => {
       resultPolygons.push(points)
     }
 
-    return polygonToPath(resultPolygons)
+    const bbox = getBoundingBox(resultPolygons)
+    return { path: polygonToPath(resultPolygons), bbox }
   } catch (error) {
     console.warn("Boolean union failed, using simple polygons", error)
-    return polygonToPath(allPolygons)
+    const bbox = getBoundingBox(allPolygons)
+    return { path: polygonToPath(allPolygons), bbox }
   }
 }
 
-const glyphs: opentype.Glyph[] = [
-  new opentype.Glyph({
-    name: ".notdef",
-    unicode: 0,
-    advanceWidth: UNITS_PER_EM,
-    path: new opentype.Path(),
-  }),
-]
+// First pass: calculate all glyph data and find the maximum width
+const glyphData: Array<{
+  char: string
+  codePoint: number
+  path: opentype.Path
+  bbox: ReturnType<typeof getBoundingBox>
+  glyphWidth: number
+}> = []
+
+let maxGlyphWidth = 0
 
 for (const [char, pathData] of Object.entries(svgAlphabet)) {
   if (!char) {
@@ -169,12 +225,39 @@ for (const [char, pathData] of Object.entries(svgAlphabet)) {
     continue
   }
 
+  const { path, bbox } = createGlyphPath(pathData)
+  const glyphWidth = (bbox.maxX - bbox.minX) * UNITS_PER_EM
+
+  maxGlyphWidth = Math.max(maxGlyphWidth, glyphWidth)
+
+  glyphData.push({ char, codePoint, path, bbox, glyphWidth })
+}
+
+// Calculate fixed monospace width based on the widest glyph
+const MONOSPACE_WIDTH = maxGlyphWidth + maxGlyphWidth * SIDE_BEARING_PERCENT * 2
+
+// Second pass: create glyphs with fixed monospace width
+const glyphs: opentype.Glyph[] = [
+  new opentype.Glyph({
+    name: ".notdef",
+    unicode: 0,
+    advanceWidth: MONOSPACE_WIDTH,
+    path: new opentype.Path(),
+  }),
+]
+
+for (const { char, codePoint, path, bbox, glyphWidth } of glyphData) {
+  // Center the glyph within the monospace width
+  const leftSideBearing =
+    (MONOSPACE_WIDTH - glyphWidth) / 2 - bbox.minX * UNITS_PER_EM
+
   glyphs.push(
     new opentype.Glyph({
       name: char,
       unicode: codePoint,
-      advanceWidth: UNITS_PER_EM,
-      path: createGlyphPath(pathData),
+      advanceWidth: MONOSPACE_WIDTH,
+      path,
+      leftSideBearing,
     }),
   )
 }
