@@ -264,6 +264,12 @@ for (const { char, codePoint, path, bbox, glyphWidth } of glyphData) {
   )
 }
 
+// Adjust space character width
+const spaceGlyph = glyphs.find(g => g.unicode === 32) // 32 is space character
+if (spaceGlyph) {
+  spaceGlyph.advanceWidth = MONOSPACE_WIDTH * 0.7 // Adjust multiplier as needed
+}
+
 glyphs.sort((a, b) => (a.unicode ?? 0) - (b.unicode ?? 0))
 
 const font = new opentype.Font({
