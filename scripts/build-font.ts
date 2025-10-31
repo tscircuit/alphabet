@@ -9,6 +9,7 @@ const UNITS_PER_EM = 1000
 const ASCENDER = UNITS_PER_EM
 const DESCENDER = 0
 const STROKE_WIDTH = 0.05 // Adjust this to make the font thicker or thinner
+const ADVANCE_WIDTH = UNITS_PER_EM * 1.2 // Add extra space for better letter spacing
 
 interface Point {
   x: number
@@ -58,11 +59,7 @@ const parsePathToSegments = (pathData: string): Point[][] => {
 }
 
 // Create a rectangle polygon around a line segment
-const expandLineSegment = (
-  p1: Point,
-  p2: Point,
-  width: number,
-): Point[] => {
+const expandLineSegment = (p1: Point, p2: Point, width: number): Point[] => {
   const dx = p2.x - p1.x
   const dy = p2.y - p1.y
   const len = Math.sqrt(dx * dx + dy * dy)
@@ -124,7 +121,9 @@ const createGlyphPath = (pathData: string) => {
     }
 
     // Create polygons
-    const polygons = allPolygons.map((pts) => new Polygon(pts.map((p) => [p.x, p.y])))
+    const polygons = allPolygons.map(
+      (pts) => new Polygon(pts.map((p) => [p.x, p.y])),
+    )
 
     // Union all polygons using BooleanOperations
     let unified = polygons[0]
@@ -153,7 +152,7 @@ const glyphs: opentype.Glyph[] = [
   new opentype.Glyph({
     name: ".notdef",
     unicode: 0,
-    advanceWidth: UNITS_PER_EM,
+    advanceWidth: ADVANCE_WIDTH,
     path: new opentype.Path(),
   }),
 ]
@@ -169,11 +168,17 @@ for (const [char, pathData] of Object.entries(svgAlphabet)) {
     continue
   }
 
+  let charAdvanceWidth = ADVANCE_WIDTH
+
+  if (char === " ") {
+    charAdvanceWidth = UNITS_PER_EM * 0.6
+  }
+
   glyphs.push(
     new opentype.Glyph({
       name: char,
       unicode: codePoint,
-      advanceWidth: UNITS_PER_EM,
+      advanceWidth: charAdvanceWidth,
       path: createGlyphPath(pathData),
     }),
   )
