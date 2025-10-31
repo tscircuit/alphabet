@@ -150,16 +150,28 @@ const polygonToPath = (polygons: Point[][]): opentype.Path => {
   return path
 }
 
-// Translate an opentype.js path by (dx, dy) in font units
+// Translate an opentype.js path by (dx, dy) in font units (typed, no `any`)
+type MutableCommand = { x?: number; y?: number; x1?: number; y1?: number; x2?: number; y2?: number }
 const translatePath = (path: opentype.Path, dx: number, dy: number): void => {
-  for (const cmd of path.commands) {
-    if ((cmd as any).x !== undefined) (cmd as any).x += dx
-    if ((cmd as any).y !== undefined) (cmd as any).y += dy
-    if ((cmd as any).x1 !== undefined) (cmd as any).x1 += dx
-    if ((cmd as any).y1 !== undefined) (cmd as any).y1 += dy
-    if ((cmd as any).x2 !== undefined) (cmd as any).x2 += dx
-    if ((cmd as any).y2 !== undefined) (cmd as any).y2 += dy
+  for (const cmd of path.commands as unknown as MutableCommand[]) {
+    if (typeof cmd.x === "number") cmd.x += dx
+    if (typeof cmd.y === "number") cmd.y += dy
+    if (typeof cmd.x1 === "number") cmd.x1 += dx
+    if (typeof cmd.y1 === "number") cmd.y1 += dy
+    if (typeof cmd.x2 === "number") cmd.x2 += dx
+    if (typeof cmd.y2 === "number") cmd.y2 += dy
   }
+}
+
+// Measure minimum Y of an opentype path in font units
+const getPathMinY = (path: opentype.Path): number => {
+  let minY = Number.POSITIVE_INFINITY
+  for (const cmd of path.commands) {
+    if ((cmd as any).y !== undefined) minY = Math.min(minY, (cmd as any).y)
+    if ((cmd as any).y1 !== undefined) minY = Math.min(minY, (cmd as any).y1)
+    if ((cmd as any).y2 !== undefined) minY = Math.min(minY, (cmd as any).y2)
+  }
+  return minY
 }
 
 const createGlyphPath = (
@@ -286,6 +298,14 @@ for (const { char, codePoint, path, bbox, glyphWidth } of glyphData) {
   // Center the glyph within the monospace width
   const leftSideBearing =
     (MONOSPACE_WIDTH - glyphWidth) / 2 - bbox.minX * UNITS_PER_EM
+
+  // Ensure descenders drop to the configured DESCENDER depth
+  if (DESCENDERS.has(char)) {
+    const currentMinY = getPathMinY(path)
+    const desiredMinY = DESCENDER // negative value in font units
+    const delta = desiredMinY - currentMinY
+    if (Number.isFinite(delta) && delta !== 0) translatePath(path, 0, delta)
+  }
 
   glyphs.push(
     new opentype.Glyph({
