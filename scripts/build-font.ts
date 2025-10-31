@@ -9,7 +9,7 @@ const UNITS_PER_EM = 1000
 // Match Arial's proportions: ascender at ~90.5% and descender at ~21.2% of em
 const ASCENDER = 905
 const DESCENDER = -212
-const STROKE_WIDTH = 0.16 // Adjust this to make the font thicker or thinner
+const STROKE_WIDTH = 0.12 // Thinner strokes for better readability
 const SIDE_BEARING_PERCENT = 0.1 // 10% of glyph width on each side
 
 interface Point {
@@ -150,6 +150,18 @@ const polygonToPath = (polygons: Point[][]): opentype.Path => {
   return path
 }
 
+// Translate an opentype.js path by (dx, dy) in font units
+const translatePath = (path: opentype.Path, dx: number, dy: number): void => {
+  for (const cmd of path.commands) {
+    if ((cmd as any).x !== undefined) (cmd as any).x += dx
+    if ((cmd as any).y !== undefined) (cmd as any).y += dy
+    if ((cmd as any).x1 !== undefined) (cmd as any).x1 += dx
+    if ((cmd as any).y1 !== undefined) (cmd as any).y1 += dy
+    if ((cmd as any).x2 !== undefined) (cmd as any).x2 += dx
+    if ((cmd as any).y2 !== undefined) (cmd as any).y2 += dy
+  }
+}
+
 const createGlyphPath = (
   pathData: string,
 ): { path: opentype.Path; bbox: ReturnType<typeof getBoundingBox> } => {
@@ -252,6 +264,19 @@ for (const { char, codePoint, path, bbox, glyphWidth } of glyphData) {
   // Center the glyph within the monospace width
   const leftSideBearing =
     (MONOSPACE_WIDTH - glyphWidth) / 2 - bbox.minX * UNITS_PER_EM
+  // Align baseline for non-descenders
+  const hasDescender = new Set(["g", "j", "p", "q", "y", ","]).has(char)
+  if (!hasDescender) {
+    // Compute actual path minY in font units to account for stroke caps
+    let pathMinY = Number.POSITIVE_INFINITY
+    for (const cmd of path.commands) {
+      if ((cmd as any).y !== undefined) pathMinY = Math.min(pathMinY, (cmd as any).y)
+      if ((cmd as any).y1 !== undefined) pathMinY = Math.min(pathMinY, (cmd as any).y1)
+      if ((cmd as any).y2 !== undefined) pathMinY = Math.min(pathMinY, (cmd as any).y2)
+    }
+    const yShift = -pathMinY
+    if (Number.isFinite(yShift) && yShift !== 0) translatePath(path, 0, yShift)
+  }
 
   glyphs.push(
     new opentype.Glyph({
@@ -274,6 +299,32 @@ const font = new opentype.Font({
   descender: DESCENDER,
   glyphs,
 })
+
+// Update key metric tables for monospace fonts when available
+try {
+  const anyFont: any = font as any
+  if (anyFont.tables && anyFont.tables.hhea) {
+    anyFont.tables.hhea.ascent = ASCENDER
+    anyFont.tables.hhea.descent = DESCENDER
+    anyFont.tables.hhea.lineGap = 0
+    anyFont.tables.hhea.advanceWidthMax = Math.round(MONOSPACE_WIDTH)
+  }
+  if (anyFont.tables && anyFont.tables.os2) {
+    anyFont.tables.os2.sTypoAscender = ASCENDER
+    anyFont.tables.os2.sTypoDescender = DESCENDER
+    anyFont.tables.os2.sTypoLineGap = 0
+    anyFont.tables.os2.usWinAscent = ASCENDER
+    anyFont.tables.os2.usWinDescent = -DESCENDER
+    anyFont.tables.os2.xAvgCharWidth = Math.round(MONOSPACE_WIDTH)
+    anyFont.tables.os2.panose = anyFont.tables.os2.panose || {}
+    anyFont.tables.os2.panose.proportion = 9 // monospace
+  }
+  if (anyFont.tables && anyFont.tables.post) {
+    anyFont.tables.post.isFixedPitch = 1
+  }
+} catch (err) {
+  console.warn("Warning updating font metric tables:", err)
+}
 
 const outputPath = join("dist", "TscircuitAlphabet.ttf")
 mkdirSync(dirname(outputPath), { recursive: true })
