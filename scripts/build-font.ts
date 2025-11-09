@@ -9,7 +9,7 @@ const UNITS_PER_EM = 1000
 // Match Arial's proportions: ascender at ~90.5% and descender at ~21.2% of em
 const ASCENDER = 905
 const DESCENDER = -212
-const STROKE_WIDTH = 0.16 // Adjust this to make the font thicker or thinner
+const STROKE_WIDTH = 0.12 // Adjust this to make the font thicker or thinner
 const SIDE_BEARING_PERCENT = 0.05
 
 interface Point {
