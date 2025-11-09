@@ -10,7 +10,7 @@ const ASCENDER = 905
 const DESCENDER = -212
 const STROKE_WIDTH = 0.12
 const SIDE_BEARING_PERCENT = 0.1
-const NORMALIZED_BASELINE = 0.76
+const NORMALIZED_BASELINE = 0.85
 const DESCENDER_CHARS = new Set(["g", "j", "p", "q", "y", ","])
 
 interface Point {
