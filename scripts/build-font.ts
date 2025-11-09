@@ -10,7 +10,7 @@ const UNITS_PER_EM = 1000
 const ASCENDER = 905
 const DESCENDER = -212
 const STROKE_WIDTH = 0.16 // Adjust this to make the font thicker or thinner
-const SIDE_BEARING_PERCENT = 0.1 // 10% of glyph width on each side
+const SIDE_BEARING_PERCENT = 0.05
 
 interface Point {
   x: number
@@ -60,7 +60,12 @@ const parsePathToSegments = (pathData: string): Point[][] => {
 }
 
 // Create a capsule shape (rectangle with rounded ends) for a line segment
-const expandLineSegment = (p1: Point, p2: Point, width: number, segments = 8): Point[] => {
+const expandLineSegment = (
+  p1: Point,
+  p2: Point,
+  width: number,
+  segments = 8,
+): Point[] => {
   const dx = p2.x - p1.x
   const dy = p2.y - p1.y
   const len = Math.sqrt(dx * dx + dy * dy)
