@@ -6,18 +6,18 @@ import { Polygon, BooleanOperations } from "@flatten-js/core"
 import { svgAlphabet } from "../index.ts"
 
 const UNITS_PER_EM = 1000
-// Match Arial's proportions: ascender at ~90.5% and descender at ~21.2% of em
 const ASCENDER = 905
 const DESCENDER = -212
-const STROKE_WIDTH = 0.16 // Adjust this to make the font thicker or thinner
-const SIDE_BEARING_PERCENT = 0.1 // 10% of glyph width on each side
+const STROKE_WIDTH = 0.12
+const SIDE_BEARING_PERCENT = 0.1
+const NORMALIZED_BASELINE = 0.76
+const DESCENDER_CHARS = new Set(["g", "j", "p", "q", "y", ","])
 
 interface Point {
   x: number
   y: number
 }
 
-// Parse SVG path data into line segments
 const parsePathToSegments = (pathData: string): Point[][] => {
   const normalized = pathData.replace(/\s+/g, " ").trim()
   const segments = normalized.match(/[ML][^ML]*/g) ?? []
@@ -45,9 +45,9 @@ const parsePathToSegments = (pathData: string): Point[][] => {
         if (currentLine.length > 0) {
           lines.push(currentLine)
         }
-        currentLine = [{ x, y: 1 - y }] // Flip y-axis
+        currentLine = [{ x, y: 1 - y }]
       } else if (type === "L") {
-        currentLine.push({ x, y: 1 - y }) // Flip y-axis
+        currentLine.push({ x, y: 1 - y })
       }
     }
   }
@@ -59,8 +59,12 @@ const parsePathToSegments = (pathData: string): Point[][] => {
   return lines
 }
 
-// Create a capsule shape (rectangle with rounded ends) for a line segment
-const expandLineSegment = (p1: Point, p2: Point, width: number, segments = 8): Point[] => {
+const expandLineSegment = (
+  p1: Point,
+  p2: Point,
+  width: number,
+  segments = 8,
+): Point[] => {
   const dx = p2.x - p1.x
   const dy = p2.y - p1.y
   const len = Math.sqrt(dx * dx + dy * dy)
@@ -68,21 +72,15 @@ const expandLineSegment = (p1: Point, p2: Point, width: number, segments = 8): P
   if (len === 0) return []
 
   const radius = width / 2
-
-  // Perpendicular unit vector
   const perpX = (-dy / len) * radius
   const perpY = (dx / len) * radius
-
-  // Calculate the angle of the line
   const lineAngle = Math.atan2(dy, dx)
 
   const points: Point[] = []
 
-  // Side 1: from p1 to p2 (offset in perpendicular direction)
   points.push({ x: p1.x + perpX, y: p1.y + perpY })
   points.push({ x: p2.x + perpX, y: p2.y + perpY })
 
-  // Semicircle around p2 (from +perp to -perp)
   for (let i = 1; i < segments; i++) {
     const angle = lineAngle + Math.PI / 2 - (i / segments) * Math.PI
     points.push({
@@ -91,11 +89,9 @@ const expandLineSegment = (p1: Point, p2: Point, width: number, segments = 8): P
     })
   }
 
-  // Side 2: from p2 to p1 (offset in opposite perpendicular direction)
   points.push({ x: p2.x - perpX, y: p2.y - perpY })
   points.push({ x: p1.x - perpX, y: p1.y - perpY })
 
-  // Semicircle around p1 (from -perp to +perp)
   for (let i = 1; i < segments; i++) {
     const angle = lineAngle - Math.PI / 2 - (i / segments) * Math.PI
     points.push({
@@ -107,7 +103,6 @@ const expandLineSegment = (p1: Point, p2: Point, width: number, segments = 8): P
   return points
 }
 
-// Calculate bounding box of polygons in normalized coordinates
 const getBoundingBox = (
   polygons: Point[][],
 ): { minX: number; maxX: number; minY: number; maxY: number } => {
@@ -128,20 +123,23 @@ const getBoundingBox = (
   return { minX, maxX, minY, maxY }
 }
 
-// Convert polygon points to opentype.js path
-// Scale to match the ascender height (glyphs go from baseline 0 to ascender)
-const polygonToPath = (polygons: Point[][]): opentype.Path => {
+const polygonToPath = (
+  polygons: Point[][],
+  normalizeBaseline: boolean,
+  bbox: ReturnType<typeof getBoundingBox>,
+): opentype.Path => {
   const path = new opentype.Path()
+  const yOffset = -NORMALIZED_BASELINE * ASCENDER
 
   for (const polygon of polygons) {
     if (polygon.length === 0) continue
 
     const first = polygon[0]
-    path.moveTo(first.x * UNITS_PER_EM, first.y * ASCENDER)
+    path.moveTo(first.x * UNITS_PER_EM, first.y * ASCENDER + yOffset)
 
     for (let i = 1; i < polygon.length; i++) {
       const pt = polygon[i]
-      path.lineTo(pt.x * UNITS_PER_EM, pt.y * ASCENDER)
+      path.lineTo(pt.x * UNITS_PER_EM, pt.y * ASCENDER + yOffset)
     }
 
     path.closePath()
@@ -152,11 +150,11 @@ const polygonToPath = (polygons: Point[][]): opentype.Path => {
 
 const createGlyphPath = (
   pathData: string,
+  normalizeBaseline: boolean,
 ): { path: opentype.Path; bbox: ReturnType<typeof getBoundingBox> } => {
   const lines = parsePathToSegments(pathData)
   const allPolygons: Point[][] = []
 
-  // Expand each line segment into a capsule with rounded caps
   for (const line of lines) {
     for (let i = 0; i < line.length - 1; i++) {
       const capsule = expandLineSegment(line[i], line[i + 1], STROKE_WIDTH)
@@ -166,7 +164,6 @@ const createGlyphPath = (
     }
   }
 
-  // Use boolean union to merge overlapping polygons
   try {
     if (allPolygons.length === 0) {
       return {
@@ -175,18 +172,15 @@ const createGlyphPath = (
       }
     }
 
-    // Create polygons
     const polygons = allPolygons.map(
       (pts) => new Polygon(pts.map((p) => [p.x, p.y])),
     )
 
-    // Union all polygons using BooleanOperations
     let unified = polygons[0]
     for (let i = 1; i < polygons.length; i++) {
       unified = BooleanOperations.unify(unified, polygons[i])
     }
 
-    // Convert back to point arrays
     const resultPolygons: Point[][] = []
     for (const face of unified.faces) {
       const points: Point[] = []
@@ -197,15 +191,17 @@ const createGlyphPath = (
     }
 
     const bbox = getBoundingBox(resultPolygons)
-    return { path: polygonToPath(resultPolygons), bbox }
+    return {
+      path: polygonToPath(resultPolygons, normalizeBaseline, bbox),
+      bbox,
+    }
   } catch (error) {
     console.warn("Boolean union failed, using simple polygons", error)
     const bbox = getBoundingBox(allPolygons)
-    return { path: polygonToPath(allPolygons), bbox }
+    return { path: polygonToPath(allPolygons, normalizeBaseline, bbox), bbox }
   }
 }
 
-// First pass: calculate all glyph data and find the maximum width
 const glyphData: Array<{
   char: string
   codePoint: number
@@ -227,7 +223,8 @@ for (const [char, pathData] of Object.entries(svgAlphabet)) {
     continue
   }
 
-  const { path, bbox } = createGlyphPath(pathData)
+  const normalizeBaseline = !DESCENDER_CHARS.has(char)
+  const { path, bbox } = createGlyphPath(pathData, normalizeBaseline)
   const glyphWidth = (bbox.maxX - bbox.minX) * UNITS_PER_EM
 
   maxGlyphWidth = Math.max(maxGlyphWidth, glyphWidth)
@@ -235,10 +232,8 @@ for (const [char, pathData] of Object.entries(svgAlphabet)) {
   glyphData.push({ char, codePoint, path, bbox, glyphWidth })
 }
 
-// Calculate fixed monospace width based on the widest glyph
 const MONOSPACE_WIDTH = maxGlyphWidth + maxGlyphWidth * SIDE_BEARING_PERCENT * 2
 
-// Second pass: create glyphs with fixed monospace width
 const glyphs: opentype.Glyph[] = [
   new opentype.Glyph({
     name: ".notdef",
@@ -249,7 +244,6 @@ const glyphs: opentype.Glyph[] = [
 ]
 
 for (const { char, codePoint, path, bbox, glyphWidth } of glyphData) {
-  // Center the glyph within the monospace width
   const leftSideBearing =
     (MONOSPACE_WIDTH - glyphWidth) / 2 - bbox.minX * UNITS_PER_EM
 
