@@ -2,6 +2,8 @@
 
 A TypeScript library that provides SVG path data and line segments for rendering letters, numbers and basic symbols. Each character is normalized to fit within a 1x1 unit square.
 
+[![NPM Version](https://img.shields.io/npm/v/%40tscircuit%2Falphabet)](https://npmjs.org/package/@tscircuit/alphabet)
+
 ## Features
 
 - SVG path data for letters A-Z, numbers 0-9, and common symbols
