@@ -19,7 +19,7 @@
     "typescript": "^5.0.0"
   },
   "scripts": {
-    "build": "tsup-node ./index.ts --format esm --dts && bun run build:font",
+    "build": "tsup-node ./index.ts --format esm --dts",
     "build:font": "bun scripts/build-font.ts",
     "format": "biome format --write ."
   },
