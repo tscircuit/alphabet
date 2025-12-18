@@ -33,7 +33,11 @@ test("renders all characters grid", async () => {
   ${lines
     .map(
       (line, i) =>
-        `<text x="${padding}" y="${fontSize + padding + i * lineHeight}" font-family="TscircuitAlphabet" font-size="${fontSize}" fill="black">${escapeXml(line)}</text>`,
+        `<text x="${padding}" y="${
+          fontSize + padding + i * lineHeight
+        }" font-family="TscircuitAlphabet" font-size="${fontSize}" fill="black">${escapeXml(
+          line,
+        )}</text>`,
     )
     .join("\n  ")}
 </svg>`

@@ -28,11 +28,11 @@ describe("SVG Character Snapshots", () => {
     const viewBoxHeight = rows * effectiveCellHeight
 
     const pathElements: string[] = []
-    
+
     for (let i = 0; i < numChars; i++) {
       const char = characters[i]
       const charPath = svgAlphabet[char as keyof typeof svgAlphabet]
-      
+
       const rowIndex = Math.floor(i / cols)
       const colIndex = i % cols
 
@@ -42,14 +42,24 @@ describe("SVG Character Snapshots", () => {
       const translateY = rowIndex * effectiveCellHeight + margin / 2
 
       pathElements.push(
-        `  <path d="${charPath}" transform="translate(${translateX.toFixed(3)}, ${translateY.toFixed(3)})" stroke="black" stroke-width="0.02" fill="none" stroke-linecap="round" stroke-linejoin="round" />`,
+        `  <path d="${charPath}" transform="translate(${translateX.toFixed(
+          3,
+        )}, ${translateY.toFixed(
+          3,
+        )})" stroke="black" stroke-width="0.02" fill="none" stroke-linecap="round" stroke-linejoin="round" />`,
       )
     }
 
     const svgContent = pathElements.join("\n")
-    const backgroundRect = `<rect width="${viewBoxWidth.toFixed(3)}" height="${viewBoxHeight.toFixed(3)}" fill="white" />`
-    const svgOutput = `<svg viewBox="0 0 ${viewBoxWidth.toFixed(3)} ${viewBoxHeight.toFixed(3)}" xmlns="http://www.w3.org/2000/svg">\n${backgroundRect}\n${svgContent}\n</svg>`
-    
+    const backgroundRect = `<rect width="${viewBoxWidth.toFixed(
+      3,
+    )}" height="${viewBoxHeight.toFixed(3)}" fill="white" />`
+    const svgOutput = `<svg viewBox="0 0 ${viewBoxWidth.toFixed(
+      3,
+    )} ${viewBoxHeight.toFixed(
+      3,
+    )}" xmlns="http://www.w3.org/2000/svg">\n${backgroundRect}\n${svgContent}\n</svg>`
+
     await expect(svgOutput).toMatchSvgSnapshot(import.meta.path)
   })
 })
