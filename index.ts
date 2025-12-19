@@ -86,7 +86,6 @@ export const svgAlphabet = {
   "/": "M0 1L1 0",
   "\\": "M0 0L1 1",
   "#": "M0.38 0.05L0.28 0.95M0.78 0.05L0.68 0.95M0.10 0.38L1.00 0.28M0.05 0.78L0.95 0.68",
-
 }
 
 export const lineAlphabet: Record<
