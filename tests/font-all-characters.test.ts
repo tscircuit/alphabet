@@ -9,7 +9,7 @@ test("renders all characters grid", async () => {
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
     "abcdefghijklmnopqrstuvwxyz",
     "0123456789",
-    ".,*()-+=_[]<>'\"/\\",
+    ".,*()-+=_[]<>'\"/\\ #",
     "23+39=62",
     "43 + 17 = 60",
     "43-17 = 26",
