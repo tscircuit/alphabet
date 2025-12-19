@@ -8,7 +8,6 @@ test("renders all special characters", async () => {
     .filter((char) => !/[a-zA-Z0-9]/.test(char))
     .sort()
     .join("")
-  console.log(specialCharacters)
   const pngBuffer = renderTextToPng(specialCharacters, {
     filename: "font-special-characters.png",
   })
