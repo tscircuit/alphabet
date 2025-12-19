@@ -10,6 +10,9 @@ test("renders all characters grid", async () => {
     "abcdefghijklmnopqrstuvwxyz",
     "0123456789",
     ".,*()-+=_[]<>'\"/\\",
+    "23+39=62",
+    "43 + 17 = 60",
+    "43-17 = 26",
   ]
   const fontSize = 60
   const lineHeight = fontSize * 1.8
