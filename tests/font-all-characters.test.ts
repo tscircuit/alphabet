@@ -13,6 +13,8 @@ test("renders all characters grid", async () => {
     "23+39=62",
     "43 + 17 = 60",
     "43-17 = 26",
+    "4*5=20",
+    "45 * 2 = 90",
   ]
   const fontSize = 60
   const lineHeight = fontSize * 1.8
