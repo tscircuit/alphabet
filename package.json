@@ -2,6 +2,17 @@
   "name": "@tscircuit/alphabet",
   "version": "0.0.6",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./base64font": {
+      "types": "./dist/base64font.d.ts",
+      "default": "./dist/base64font.js"
+    }
+  },
   "files": [
     "dist"
   ],
@@ -19,8 +30,9 @@
     "typescript": "^5.0.0"
   },
   "scripts": {
-    "build": "tsup-node ./index.ts --format esm --dts",
+    "build": "tsup-node ./index.ts --format esm --dts && bun run build:font && bun run build:base64font",
     "build:font": "bun scripts/build-font.ts",
+    "build:base64font": "bun scripts/encode-font.ts",
     "format": "biome format --write .",
     "format:check": "biome format --write ."
   },
