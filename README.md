@@ -45,3 +45,5 @@ bun run index.ts
 ```
 
 This project uses [Bun](https://bun.sh) as its JavaScript/TypeScript runtime.
+
+You can use [this website](https://yqnn.github.io/svg-path-editor/) to edit paths to change letters
