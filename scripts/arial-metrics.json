@@ -1,0 +1,749 @@
+{
+  "0": {
+    "width": 466.796875,
+    "height": 730.95703125,
+    "advanceWidth": 556.15234375,
+    "leftSideBearing": 41.50390625,
+    "rightSideBearing": 47.8515625,
+    "yMin": -12.20703125,
+    "yMax": 718.75
+  },
+  "1": {
+    "width": 263.671875,
+    "height": 718.75,
+    "advanceWidth": 556.15234375,
+    "leftSideBearing": 108.88671875,
+    "rightSideBearing": 183.59375,
+    "yMin": 0,
+    "yMax": 718.75
+  },
+  "2": {
+    "width": 473.2203483581543,
+    "height": 718.75,
+    "advanceWidth": 556.15234375,
+    "leftSideBearing": 30.197620391845703,
+    "rightSideBearing": 52.734375,
+    "yMin": 0,
+    "yMax": 718.75
+  },
+  "3": {
+    "width": 468.75,
+    "height": 731.4453125,
+    "advanceWidth": 556.15234375,
+    "leftSideBearing": 41.9921875,
+    "rightSideBearing": 45.41015625,
+    "yMin": -12.6953125,
+    "yMax": 718.75
+  },
+  "4": {
+    "width": 495.1171875,
+    "height": 715.8203125,
+    "advanceWidth": 556.15234375,
+    "leftSideBearing": 12.6953125,
+    "rightSideBearing": 48.33984375,
+    "yMin": 0,
+    "yMax": 715.8203125
+  },
+  "5": {
+    "width": 474.609375,
+    "height": 718.26171875,
+    "advanceWidth": 556.15234375,
+    "leftSideBearing": 41.50390625,
+    "rightSideBearing": 40.0390625,
+    "yMin": -12.20703125,
+    "yMax": 706.0546875
+  },
+  "6": {
+    "width": 472.65625,
+    "height": 730.95703125,
+    "advanceWidth": 556.15234375,
+    "leftSideBearing": 37.59765625,
+    "rightSideBearing": 45.8984375,
+    "yMin": -12.20703125,
+    "yMax": 718.75
+  },
+  "7": {
+    "width": 463.37890625,
+    "height": 706.54296875,
+    "advanceWidth": 556.15234375,
+    "leftSideBearing": 47.36328125,
+    "rightSideBearing": 45.41015625,
+    "yMin": 0,
+    "yMax": 706.54296875
+  },
+  "8": {
+    "width": 471.6796875,
+    "height": 730.95703125,
+    "advanceWidth": 556.15234375,
+    "leftSideBearing": 40.52734375,
+    "rightSideBearing": 43.9453125,
+    "yMin": -12.20703125,
+    "yMax": 718.75
+  },
+  "9": {
+    "width": 470.703125,
+    "height": 730.95703125,
+    "advanceWidth": 556.15234375,
+    "leftSideBearing": 41.50390625,
+    "rightSideBearing": 43.9453125,
+    "yMin": -12.20703125,
+    "yMax": 718.75
+  },
+  "A": {
+    "width": 669.921875,
+    "height": 715.8203125,
+    "advanceWidth": 666.9921875,
+    "leftSideBearing": -1.46484375,
+    "rightSideBearing": -1.46484375,
+    "yMin": 0,
+    "yMax": 715.8203125
+  },
+  "B": {
+    "width": 540.52734375,
+    "height": 715.8203125,
+    "advanceWidth": 666.9921875,
+    "leftSideBearing": 73.2421875,
+    "rightSideBearing": 53.22265625,
+    "yMin": 0,
+    "yMax": 715.8203125
+  },
+  "C": {
+    "width": 632.8125,
+    "height": 740.234375,
+    "advanceWidth": 722.16796875,
+    "leftSideBearing": 49.8046875,
+    "rightSideBearing": 39.55078125,
+    "yMin": -12.20703125,
+    "yMax": 728.02734375
+  },
+  "D": {
+    "width": 591.796875,
+    "height": 715.8203125,
+    "advanceWidth": 722.16796875,
+    "leftSideBearing": 77.1484375,
+    "rightSideBearing": 53.22265625,
+    "yMin": 0,
+    "yMax": 715.8203125
+  },
+  "E": {
+    "width": 534.1796875,
+    "height": 715.8203125,
+    "advanceWidth": 666.9921875,
+    "leftSideBearing": 79.1015625,
+    "rightSideBearing": 53.7109375,
+    "yMin": 0,
+    "yMax": 715.8203125
+  },
+  "F": {
+    "width": 482.91015625,
+    "height": 715.8203125,
+    "advanceWidth": 610.83984375,
+    "leftSideBearing": 82.03125,
+    "rightSideBearing": 45.8984375,
+    "yMin": 0,
+    "yMax": 715.8203125
+  },
+  "G": {
+    "width": 662.109375,
+    "height": 740.234375,
+    "advanceWidth": 777.83203125,
+    "leftSideBearing": 53.22265625,
+    "rightSideBearing": 62.5,
+    "yMin": -12.20703125,
+    "yMax": 728.02734375
+  },
+  "H": {
+    "width": 561.5234375,
+    "height": 715.8203125,
+    "advanceWidth": 722.16796875,
+    "leftSideBearing": 80.078125,
+    "rightSideBearing": 80.56640625,
+    "yMin": 0,
+    "yMax": 715.8203125
+  },
+  "I": {
+    "width": 94.7265625,
+    "height": 715.8203125,
+    "advanceWidth": 277.83203125,
+    "leftSideBearing": 93.26171875,
+    "rightSideBearing": 89.84375,
+    "yMin": 0,
+    "yMax": 715.8203125
+  },
+  "J": {
+    "width": 393.5546875,
+    "height": 728.02734375,
+    "advanceWidth": 500,
+    "leftSideBearing": 28.80859375,
+    "rightSideBearing": 77.63671875,
+    "yMin": -12.20703125,
+    "yMax": 715.8203125
+  },
+  "K": {
+    "width": 591.796875,
+    "height": 715.8203125,
+    "advanceWidth": 666.9921875,
+    "leftSideBearing": 73.2421875,
+    "rightSideBearing": 1.953125,
+    "yMin": 0,
+    "yMax": 715.8203125
+  },
+  "L": {
+    "width": 447.265625,
+    "height": 715.8203125,
+    "advanceWidth": 556.15234375,
+    "leftSideBearing": 73.2421875,
+    "rightSideBearing": 35.64453125,
+    "yMin": 0,
+    "yMax": 715.8203125
+  },
+  "M": {
+    "width": 683.10546875,
+    "height": 715.8203125,
+    "advanceWidth": 833.0078125,
+    "leftSideBearing": 74.21875,
+    "rightSideBearing": 75.68359375,
+    "yMin": 0,
+    "yMax": 715.8203125
+  },
+  "N": {
+    "width": 563.96484375,
+    "height": 715.8203125,
+    "advanceWidth": 722.16796875,
+    "leftSideBearing": 76.171875,
+    "rightSideBearing": 82.03125,
+    "yMin": 0,
+    "yMax": 715.8203125
+  },
+  "O": {
+    "width": 684.5703125,
+    "height": 740.72265625,
+    "advanceWidth": 777.83203125,
+    "leftSideBearing": 48.33984375,
+    "rightSideBearing": 44.921875,
+    "yMin": -12.20703125,
+    "yMax": 728.515625
+  },
+  "P": {
+    "width": 546.38671875,
+    "height": 715.8203125,
+    "advanceWidth": 666.9921875,
+    "leftSideBearing": 77.1484375,
+    "rightSideBearing": 43.45703125,
+    "yMin": 0,
+    "yMax": 715.8203125
+  },
+  "Q": {
+    "width": 698.2421875,
+    "height": 784.1796875,
+    "advanceWidth": 777.83203125,
+    "leftSideBearing": 42.96875,
+    "rightSideBearing": 36.62109375,
+    "yMin": -55.6640625,
+    "yMax": 728.515625
+  },
+  "R": {
+    "width": 630.859375,
+    "height": 715.8203125,
+    "advanceWidth": 722.16796875,
+    "leftSideBearing": 78.61328125,
+    "rightSideBearing": 12.6953125,
+    "yMin": 0,
+    "yMax": 715.8203125
+  },
+  "S": {
+    "width": 569.82421875,
+    "height": 740.234375,
+    "advanceWidth": 666.9921875,
+    "leftSideBearing": 44.921875,
+    "rightSideBearing": 52.24609375,
+    "yMin": -12.20703125,
+    "yMax": 728.02734375
+  },
+  "T": {
+    "width": 567.3828125,
+    "height": 715.8203125,
+    "advanceWidth": 610.83984375,
+    "leftSideBearing": 23.4375,
+    "rightSideBearing": 20.01953125,
+    "yMin": 0,
+    "yMax": 715.8203125
+  },
+  "U": {
+    "width": 562.98828125,
+    "height": 728.02734375,
+    "advanceWidth": 722.16796875,
+    "leftSideBearing": 78.61328125,
+    "rightSideBearing": 80.56640625,
+    "yMin": -12.20703125,
+    "yMax": 715.8203125
+  },
+  "V": {
+    "width": 654.78515625,
+    "height": 715.8203125,
+    "advanceWidth": 666.9921875,
+    "leftSideBearing": 4.39453125,
+    "rightSideBearing": 7.8125,
+    "yMin": 0,
+    "yMax": 715.8203125
+  },
+  "W": {
+    "width": 920.41015625,
+    "height": 715.8203125,
+    "advanceWidth": 943.84765625,
+    "leftSideBearing": 12.20703125,
+    "rightSideBearing": 11.23046875,
+    "yMin": 0,
+    "yMax": 715.8203125
+  },
+  "X": {
+    "width": 656.25,
+    "height": 715.8203125,
+    "advanceWidth": 666.9921875,
+    "leftSideBearing": 4.39453125,
+    "rightSideBearing": 6.34765625,
+    "yMin": 0,
+    "yMax": 715.8203125
+  },
+  "Y": {
+    "width": 656.25,
+    "height": 715.8203125,
+    "advanceWidth": 666.9921875,
+    "leftSideBearing": 2.9296875,
+    "rightSideBearing": 7.8125,
+    "yMin": 0,
+    "yMax": 715.8203125
+  },
+  "Z": {
+    "width": 565.91796875,
+    "height": 715.8203125,
+    "advanceWidth": 610.83984375,
+    "leftSideBearing": 20.01953125,
+    "rightSideBearing": 24.90234375,
+    "yMin": 0,
+    "yMax": 715.8203125
+  },
+  "a": {
+    "width": 477.5390625,
+    "height": 541.9921875,
+    "advanceWidth": 556.15234375,
+    "leftSideBearing": 36.1328125,
+    "rightSideBearing": 42.48046875,
+    "yMin": -11.71875,
+    "yMax": 530.2734375
+  },
+  "b": {
+    "width": 449.70703125,
+    "height": 727.5390625,
+    "advanceWidth": 556.15234375,
+    "leftSideBearing": 65.4296875,
+    "rightSideBearing": 41.015625,
+    "yMin": -11.71875,
+    "yMax": 715.8203125
+  },
+  "c": {
+    "width": 451.66015625,
+    "height": 541.9921875,
+    "advanceWidth": 500,
+    "leftSideBearing": 39.0625,
+    "rightSideBearing": 9.27734375,
+    "yMin": -11.71875,
+    "yMax": 530.2734375
+  },
+  "d": {
+    "width": 449.70703125,
+    "height": 727.5390625,
+    "advanceWidth": 556.15234375,
+    "leftSideBearing": 34.1796875,
+    "rightSideBearing": 72.265625,
+    "yMin": -11.71875,
+    "yMax": 715.8203125
+  },
+  "e": {
+    "width": 478.02734375,
+    "height": 541.9921875,
+    "advanceWidth": 556.15234375,
+    "leftSideBearing": 36.62109375,
+    "rightSideBearing": 41.50390625,
+    "yMin": -11.71875,
+    "yMax": 530.2734375
+  },
+  "f": {
+    "width": 303.22265625,
+    "height": 728.02734375,
+    "advanceWidth": 277.83203125,
+    "leftSideBearing": 9.27734375,
+    "rightSideBearing": -34.66796875,
+    "yMin": 0,
+    "yMax": 728.02734375
+  },
+  "g": {
+    "width": 457.03125,
+    "height": 740.72265625,
+    "advanceWidth": 556.15234375,
+    "leftSideBearing": 32.2265625,
+    "rightSideBearing": 66.89453125,
+    "yMin": -210.44921875,
+    "yMax": 530.2734375
+  },
+  "h": {
+    "width": 422.36328125,
+    "height": 715.8203125,
+    "advanceWidth": 556.15234375,
+    "leftSideBearing": 65.91796875,
+    "rightSideBearing": 67.87109375,
+    "yMin": 0,
+    "yMax": 715.8203125
+  },
+  "i": {
+    "width": 87.890625,
+    "height": 715.8203125,
+    "advanceWidth": 222.16796875,
+    "leftSideBearing": 66.40625,
+    "rightSideBearing": 67.87109375,
+    "yMin": 0,
+    "yMax": 715.8203125
+  },
+  "j": {
+    "width": 199.21875,
+    "height": 926.26953125,
+    "advanceWidth": 222.16796875,
+    "leftSideBearing": -45.8984375,
+    "rightSideBearing": 68.84765625,
+    "yMin": -210.44921875,
+    "yMax": 715.8203125
+  },
+  "k": {
+    "width": 429.6875,
+    "height": 715.8203125,
+    "advanceWidth": 500,
+    "leftSideBearing": 66.40625,
+    "rightSideBearing": 3.90625,
+    "yMin": 0,
+    "yMax": 715.8203125
+  },
+  "l": {
+    "width": 87.890625,
+    "height": 715.8203125,
+    "advanceWidth": 222.16796875,
+    "leftSideBearing": 63.96484375,
+    "rightSideBearing": 70.3125,
+    "yMin": 0,
+    "yMax": 715.8203125
+  },
+  "m": {
+    "width": 702.63671875,
+    "height": 530.2734375,
+    "advanceWidth": 833.0078125,
+    "leftSideBearing": 65.91796875,
+    "rightSideBearing": 64.453125,
+    "yMin": 0,
+    "yMax": 530.2734375
+  },
+  "n": {
+    "width": 421.38671875,
+    "height": 530.2734375,
+    "advanceWidth": 556.15234375,
+    "leftSideBearing": 65.91796875,
+    "rightSideBearing": 68.84765625,
+    "yMin": 0,
+    "yMax": 530.2734375
+  },
+  "o": {
+    "width": 485.83984375,
+    "height": 541.9921875,
+    "advanceWidth": 556.15234375,
+    "leftSideBearing": 33.203125,
+    "rightSideBearing": 37.109375,
+    "yMin": -11.71875,
+    "yMax": 530.2734375
+  },
+  "p": {
+    "width": 450.1953125,
+    "height": 729.00390625,
+    "advanceWidth": 556.15234375,
+    "leftSideBearing": 65.91796875,
+    "rightSideBearing": 40.0390625,
+    "yMin": -198.73046875,
+    "yMax": 530.2734375
+  },
+  "q": {
+    "width": 449.21875,
+    "height": 729.00390625,
+    "advanceWidth": 556.15234375,
+    "leftSideBearing": 35.15625,
+    "rightSideBearing": 71.77734375,
+    "yMin": -198.73046875,
+    "yMax": 530.2734375
+  },
+  "r": {
+    "width": 281.73828125,
+    "height": 530.2734375,
+    "advanceWidth": 333.0078125,
+    "leftSideBearing": 64.94140625,
+    "rightSideBearing": -13.671875,
+    "yMin": 0,
+    "yMax": 530.2734375
+  },
+  "s": {
+    "width": 430.6640625,
+    "height": 541.9921875,
+    "advanceWidth": 500,
+    "leftSideBearing": 30.76171875,
+    "rightSideBearing": 38.57421875,
+    "yMin": -11.71875,
+    "yMax": 530.2734375
+  },
+  "t": {
+    "width": 252.9296875,
+    "height": 706.54296875,
+    "advanceWidth": 277.83203125,
+    "leftSideBearing": 17.578125,
+    "rightSideBearing": 7.32421875,
+    "yMin": -6.8359375,
+    "yMax": 699.70703125
+  },
+  "u": {
+    "width": 420.41015625,
+    "height": 530.2734375,
+    "advanceWidth": 556.15234375,
+    "leftSideBearing": 63.96484375,
+    "rightSideBearing": 71.77734375,
+    "yMin": -11.71875,
+    "yMax": 518.5546875
+  },
+  "v": {
+    "width": 475.5859375,
+    "height": 518.5546875,
+    "advanceWidth": 500,
+    "leftSideBearing": 12.6953125,
+    "rightSideBearing": 11.71875,
+    "yMin": 0,
+    "yMax": 518.5546875
+  },
+  "w": {
+    "width": 711.42578125,
+    "height": 518.5546875,
+    "advanceWidth": 722.16796875,
+    "leftSideBearing": 2.9296875,
+    "rightSideBearing": 7.8125,
+    "yMin": 0,
+    "yMax": 518.5546875
+  },
+  "x": {
+    "width": 485.3515625,
+    "height": 518.5546875,
+    "advanceWidth": 500,
+    "leftSideBearing": 7.32421875,
+    "rightSideBearing": 7.32421875,
+    "yMin": 0,
+    "yMax": 518.5546875
+  },
+  "y": {
+    "width": 475.09765625,
+    "height": 729.00390625,
+    "advanceWidth": 500,
+    "leftSideBearing": 16.11328125,
+    "rightSideBearing": 8.7890625,
+    "yMin": -210.44921875,
+    "yMax": 518.5546875
+  },
+  "z": {
+    "width": 458.984375,
+    "height": 518.5546875,
+    "advanceWidth": 500,
+    "leftSideBearing": 19.53125,
+    "rightSideBearing": 21.484375,
+    "yMin": 0,
+    "yMax": 518.5546875
+  },
+  ".": {
+    "width": 100.09765625,
+    "height": 100.09765625,
+    "advanceWidth": 277.83203125,
+    "leftSideBearing": 90.8203125,
+    "rightSideBearing": 86.9140625,
+    "yMin": 0,
+    "yMax": 100.09765625
+  },
+  "!": {
+    "width": 108.88671875,
+    "height": 715.8203125,
+    "advanceWidth": 277.83203125,
+    "leftSideBearing": 85.9375,
+    "rightSideBearing": 83.0078125,
+    "yMin": 0,
+    "yMax": 715.8203125
+  },
+  ",": {
+    "width": 105.95703125,
+    "height": 241.69921875,
+    "advanceWidth": 277.83203125,
+    "leftSideBearing": 83.0078125,
+    "rightSideBearing": 88.8671875,
+    "yMin": -141.6015625,
+    "yMax": 100.09765625
+  },
+  "*": {
+    "width": 322.75390625,
+    "height": 304.6875,
+    "advanceWidth": 389.16015625,
+    "leftSideBearing": 31.25,
+    "rightSideBearing": 35.15625,
+    "yMin": 423.33984375,
+    "yMax": 728.02734375
+  },
+  "(": {
+    "width": 236.328125,
+    "height": 938.4765625,
+    "advanceWidth": 333.0078125,
+    "leftSideBearing": 60.546875,
+    "rightSideBearing": 36.1328125,
+    "yMin": -210.44921875,
+    "yMax": 728.02734375
+  },
+  ")": {
+    "width": 236.328125,
+    "height": 938.4765625,
+    "advanceWidth": 333.0078125,
+    "leftSideBearing": 60.546875,
+    "rightSideBearing": 36.1328125,
+    "yMin": -210.44921875,
+    "yMax": 728.02734375
+  },
+  "-": {
+    "width": 270.01953125,
+    "height": 88.37890625,
+    "advanceWidth": 333.0078125,
+    "leftSideBearing": 31.73828125,
+    "rightSideBearing": 31.25,
+    "yMin": 214.84375,
+    "yMax": 303.22265625
+  },
+  "+": {
+    "width": 472.65625,
+    "height": 473.14453125,
+    "advanceWidth": 583.984375,
+    "leftSideBearing": 55.6640625,
+    "rightSideBearing": 55.6640625,
+    "yMin": 115.72265625,
+    "yMax": 588.8671875
+  },
+  "=": {
+    "width": 472.65625,
+    "height": 299.31640625,
+    "advanceWidth": 583.984375,
+    "leftSideBearing": 55.6640625,
+    "rightSideBearing": 55.6640625,
+    "yMin": 203.61328125,
+    "yMax": 502.9296875
+  },
+  "_": {
+    "width": 582.51953125,
+    "height": 63.4765625,
+    "advanceWidth": 556.15234375,
+    "leftSideBearing": -15.13671875,
+    "rightSideBearing": -11.23046875,
+    "yMin": -198.73046875,
+    "yMax": -135.25390625
+  },
+  "[": {
+    "width": 193.84765625,
+    "height": 914.55078125,
+    "advanceWidth": 277.83203125,
+    "leftSideBearing": 67.87109375,
+    "rightSideBearing": 16.11328125,
+    "yMin": -198.73046875,
+    "yMax": 715.8203125
+  },
+  "]": {
+    "width": 193.84765625,
+    "height": 914.55078125,
+    "advanceWidth": 277.83203125,
+    "leftSideBearing": 19.04296875,
+    "rightSideBearing": 64.94140625,
+    "yMin": -198.73046875,
+    "yMax": 715.8203125
+  },
+  "<": {
+    "width": 474.12109375,
+    "height": 484.86328125,
+    "advanceWidth": 583.984375,
+    "leftSideBearing": 54.6875,
+    "rightSideBearing": 55.17578125,
+    "yMin": 110.3515625,
+    "yMax": 595.21484375
+  },
+  ">": {
+    "width": 474.12109375,
+    "height": 484.86328125,
+    "advanceWidth": 583.984375,
+    "leftSideBearing": 54.6875,
+    "rightSideBearing": 55.17578125,
+    "yMin": 110.3515625,
+    "yMax": 595.21484375
+  },
+  "'": {
+    "width": 100.09765625,
+    "height": 253.41796875,
+    "advanceWidth": 190.91796875,
+    "leftSideBearing": 43.9453125,
+    "rightSideBearing": 46.875,
+    "yMin": 462.40234375,
+    "yMax": 715.8203125
+  },
+  "\"": {
+    "width": 262.20703125,
+    "height": 253.41796875,
+    "advanceWidth": 354.98046875,
+    "leftSideBearing": 45.8984375,
+    "rightSideBearing": 46.875,
+    "yMin": 462.40234375,
+    "yMax": 715.8203125
+  },
+  "/": {
+    "width": 277.83203125,
+    "height": 740.234375,
+    "advanceWidth": 277.83203125,
+    "leftSideBearing": 0,
+    "rightSideBearing": 0,
+    "yMin": -12.20703125,
+    "yMax": 728.02734375
+  },
+  "\\": {
+    "width": 277.83203125,
+    "height": 740.234375,
+    "advanceWidth": 277.83203125,
+    "leftSideBearing": 0,
+    "rightSideBearing": 0,
+    "yMin": -12.20703125,
+    "yMax": 728.02734375
+  },
+  "#": {
+    "width": 533.203125,
+    "height": 740.234375,
+    "advanceWidth": 556.15234375,
+    "leftSideBearing": 10.25390625,
+    "rightSideBearing": 12.6953125,
+    "yMin": -12.20703125,
+    "yMax": 728.02734375
+  },
+  "$": {
+    "width": 473.6328125,
+    "height": 884.765625,
+    "advanceWidth": 556.15234375,
+    "leftSideBearing": 35.64453125,
+    "rightSideBearing": 46.875,
+    "yMin": -103.02734375,
+    "yMax": 781.73828125
+  },
+  "^": {
+    "width": 416.50390625,
+    "height": 391.11328125,
+    "advanceWidth": 469.23828125,
+    "leftSideBearing": 26.3671875,
+    "rightSideBearing": 26.3671875,
+    "yMin": 336.9140625,
+    "yMax": 728.02734375
+  }
+}

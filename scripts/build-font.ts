@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from "node:fs"
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { dirname, join } from "node:path"
 import * as opentype from "opentype.js"
 import { Polygon, BooleanOperations } from "@flatten-js/core"
@@ -12,50 +12,147 @@ const DESCENDER = -212
 const STROKE_WIDTH = 0.12 // Adjust this to make the font thicker or thinner
 const SIDE_BEARING_PERCENT = 0.05 // 10% of glyph width on each side
 
+type ArialMetrics = {
+  width: number
+  height: number
+  advanceWidth: number
+  leftSideBearing: number
+  rightSideBearing: number
+  yMin: number
+  yMax: number
+}
+
+const arialMetricsPath = new URL("./arial-metrics.json", import.meta.url)
+const arialMetricsData = JSON.parse(
+  readFileSync(arialMetricsPath, "utf8"),
+) as Record<string, ArialMetrics>
+const useArialSpacing = Object.keys(arialMetricsData).length > 0
+
+const getArialGlyphMetrics = (char: string): ArialMetrics | null => {
+  const metrics = arialMetricsData[char]
+  if (!metrics) {
+    return null
+  }
+  if (
+    !(metrics.width > 0) ||
+    !(metrics.height > 0) ||
+    !(metrics.advanceWidth > 0)
+  ) {
+    return null
+  }
+  return metrics
+}
+
+const translatePath = (path: opentype.Path, dx: number, dy: number) => {
+  if (dx === 0 && dy === 0) {
+    return
+  }
+
+  for (const command of path.commands) {
+    if ("x1" in command && typeof command.x1 === "number") {
+      command.x1 += dx
+    }
+    if ("y1" in command && typeof command.y1 === "number") {
+      command.y1 += dy
+    }
+    if ("x2" in command && typeof command.x2 === "number") {
+      command.x2 += dx
+    }
+    if ("y2" in command && typeof command.y2 === "number") {
+      command.y2 += dy
+    }
+    if ("x" in command && typeof command.x === "number") {
+      command.x += dx
+    }
+    if ("y" in command && typeof command.y === "number") {
+      command.y += dy
+    }
+  }
+}
+
 interface Point {
   x: number
   y: number
 }
 
-// Parse SVG path data into line segments
+// Parse SVG path data into line segments (supports implicit L after M).
 const parsePathToSegments = (pathData: string): Point[][] => {
-  const normalized = pathData.replace(/\s+/g, " ").trim()
-  const segments = normalized.match(/[ML][^ML]*/g) ?? []
   const lines: Point[][] = []
   let currentLine: Point[] = []
+  let currentPoint: Point | null = null
 
-  for (const segment of segments) {
-    const type = segment[0]
-    const coords = segment
-      .slice(1)
-      .trim()
-      .split(/[ ,]+/)
-      .filter(Boolean)
-      .map((value) => Number.parseFloat(value))
+  const commandTokenRegex = /[MLml]/g
+  let lastCommand: { cmd: string; index: number } | null = null
+  let match: RegExpExecArray | null
 
-    for (let i = 0; i < coords.length; i += 2) {
-      const x = coords[i]
-      const y = coords[i + 1]
-
-      if (typeof x !== "number" || typeof y !== "number") {
-        continue
-      }
-
-      if (type === "M") {
-        if (currentLine.length > 0) {
-          lines.push(currentLine)
-        }
-        currentLine = [{ x, y: 1 - y }] // Flip y-axis
-      } else if (type === "L") {
-        currentLine.push({ x, y: 1 - y }) // Flip y-axis
-      }
+  const flushLine = () => {
+    if (currentLine.length > 0) {
+      lines.push(currentLine)
+      currentLine = []
     }
   }
 
-  if (currentLine.length > 0) {
-    lines.push(currentLine)
+  const applyCommand = (cmd: string, data: string) => {
+    const numbers = data.match(/[+-]?(?:\d*\.\d+|\d+\.?\d*)(?:[eE][+-]?\d+)?/g)
+    if (!numbers || numbers.length < 2) {
+      return
+    }
+
+    const isRelative = cmd === cmd.toLowerCase()
+    const command = cmd.toUpperCase()
+    let isFirstPair = true
+
+    for (let i = 0; i + 1 < numbers.length; i += 2) {
+      let x = Number.parseFloat(numbers[i])
+      let y = Number.parseFloat(numbers[i + 1])
+
+      if (Number.isNaN(x) || Number.isNaN(y)) {
+        continue
+      }
+
+      if (isRelative && currentPoint) {
+        x += currentPoint.x
+        y += currentPoint.y
+      }
+
+      const rawPoint = { x, y }
+      const flippedPoint = { x, y: 1 - y }
+
+      if (command === "M" && isFirstPair) {
+        flushLine()
+        currentLine = [flippedPoint]
+        currentPoint = rawPoint
+        isFirstPair = false
+        continue
+      }
+
+      if (command === "M" || command === "L") {
+        if (currentLine.length === 0 && currentPoint === null) {
+          currentLine = [flippedPoint]
+        } else {
+          currentLine.push(flippedPoint)
+        }
+        currentPoint = rawPoint
+      }
+
+      isFirstPair = false
+    }
   }
 
+  while ((match = commandTokenRegex.exec(pathData)) !== null) {
+    if (lastCommand) {
+      const data = pathData.slice(lastCommand.index + 1, match.index)
+      applyCommand(lastCommand.cmd, data)
+    }
+    lastCommand = { cmd: match[0], index: match.index }
+  }
+
+  if (lastCommand) {
+    const data = pathData.slice(lastCommand.index + 1)
+    applyCommand(lastCommand.cmd, data)
+  }
+
+  flushLine()
   return lines
 }
 
@@ -133,20 +230,23 @@ const getBoundingBox = (
   return { minX, maxX, minY, maxY }
 }
 
-// Convert polygon points to opentype.js path
-// Scale to match the ascender height (glyphs go from baseline 0 to ascender)
-const polygonToPath = (polygons: Point[][]): opentype.Path => {
+// Convert polygon points to opentype.js path.
+const polygonToPath = (
+  polygons: Point[][],
+  scaleX: number,
+  scaleY: number,
+): opentype.Path => {
   const path = new opentype.Path()
 
   for (const polygon of polygons) {
     if (polygon.length === 0) continue
 
     const first = polygon[0]
-    path.moveTo(first.x * UNITS_PER_EM, first.y * ASCENDER)
+    path.moveTo(first.x * UNITS_PER_EM * scaleX, first.y * ASCENDER * scaleY)
 
     for (let i = 1; i < polygon.length; i++) {
       const pt = polygon[i]
-      path.lineTo(pt.x * UNITS_PER_EM, pt.y * ASCENDER)
+      path.lineTo(pt.x * UNITS_PER_EM * scaleX, pt.y * ASCENDER * scaleY)
     }
 
     path.closePath()
@@ -155,9 +255,9 @@ const polygonToPath = (polygons: Point[][]): opentype.Path => {
   return path
 }
 
-const createGlyphPath = (
+const createGlyphPolygons = (
   pathData: string,
-): { path: opentype.Path; bbox: ReturnType<typeof getBoundingBox> } => {
+): { polygons: Point[][]; bbox: ReturnType<typeof getBoundingBox> } => {
   const lines = parsePathToSegments(pathData)
   const allPolygons: Point[][] = []
 
@@ -175,7 +275,7 @@ const createGlyphPath = (
   try {
     if (allPolygons.length === 0) {
       return {
-        path: new opentype.Path(),
+        polygons: [],
         bbox: { minX: 0, maxX: 0, minY: 0, maxY: 0 },
       }
     }
@@ -202,11 +302,11 @@ const createGlyphPath = (
     }
 
     const bbox = getBoundingBox(resultPolygons)
-    return { path: polygonToPath(resultPolygons), bbox }
+    return { polygons: resultPolygons, bbox }
   } catch (error) {
     console.warn("Boolean union failed, using simple polygons", error)
     const bbox = getBoundingBox(allPolygons)
-    return { path: polygonToPath(allPolygons), bbox }
+    return { polygons: allPolygons, bbox }
   }
 }
 
@@ -217,9 +317,13 @@ const glyphData: Array<{
   path: opentype.Path
   bbox: ReturnType<typeof getBoundingBox>
   glyphWidth: number
+  advanceWidth: number
+  scaleX: number
+  leftSideBearing: number
+  xMin: number
 }> = []
 
-let maxGlyphWidth = 0
+let maxAdvanceWidth = 0
 
 for (const [char, pathData] of Object.entries(svgAlphabet)) {
   if (!char) {
@@ -232,16 +336,54 @@ for (const [char, pathData] of Object.entries(svgAlphabet)) {
     continue
   }
 
-  const { path, bbox } = createGlyphPath(pathData)
-  const glyphWidth = (bbox.maxX - bbox.minX) * UNITS_PER_EM
+  const { polygons, bbox } = createGlyphPolygons(pathData)
+  const bboxWidth = bbox.maxX - bbox.minX
+  const bboxHeight = bbox.maxY - bbox.minY
+  const currentWidth = bboxWidth * UNITS_PER_EM
+  const currentHeight = bboxHeight * ASCENDER
 
-  maxGlyphWidth = Math.max(maxGlyphWidth, glyphWidth)
+  const arialMetrics = getArialGlyphMetrics(char)
+  const scaleX =
+    arialMetrics && currentWidth > 0 ? arialMetrics.width / currentWidth : 1
+  const scaleY =
+    arialMetrics && currentHeight > 0 ? arialMetrics.height / currentHeight : 1
 
-  glyphData.push({ char, codePoint, path, bbox, glyphWidth })
+  const path = polygonToPath(polygons, scaleX, scaleY)
+  const glyphWidth = currentWidth * scaleX
+  const xMin = bbox.minX * UNITS_PER_EM * scaleX
+  const advanceWidth =
+    arialMetrics && arialMetrics.advanceWidth > 0
+      ? arialMetrics.advanceWidth
+      : glyphWidth + glyphWidth * SIDE_BEARING_PERCENT * 2
+  const fallbackLeftSideBearing = (advanceWidth - glyphWidth) / 2
+  const leftSideBearing = arialMetrics
+    ? arialMetrics.leftSideBearing
+    : fallbackLeftSideBearing
+  const yMin = bbox.minY * ASCENDER * scaleY
+  const yShift = arialMetrics && useArialSpacing ? arialMetrics.yMin - yMin : 0
+
+  if (useArialSpacing) {
+    const xShift = leftSideBearing - xMin
+    translatePath(path, xShift, yShift)
+  }
+
+  maxAdvanceWidth = Math.max(maxAdvanceWidth, advanceWidth)
+
+  glyphData.push({
+    char,
+    codePoint,
+    path,
+    bbox,
+    glyphWidth,
+    advanceWidth,
+    scaleX,
+    leftSideBearing,
+    xMin,
+  })
 }
 
-// Calculate fixed monospace width based on the widest glyph
-const MONOSPACE_WIDTH = maxGlyphWidth + maxGlyphWidth * SIDE_BEARING_PERCENT * 2
+// Calculate fixed monospace width based on the widest glyph (fallback mode).
+const MONOSPACE_WIDTH = maxAdvanceWidth
 
 // Second pass: create glyphs with fixed monospace width
 const glyphs: opentype.Glyph[] = [
@@ -253,18 +395,32 @@ const glyphs: opentype.Glyph[] = [
   }),
 ]
 
-for (const { char, codePoint, path, bbox, glyphWidth } of glyphData) {
-  // Center the glyph within the monospace width
-  const leftSideBearing =
-    (MONOSPACE_WIDTH - glyphWidth) / 2 - bbox.minX * UNITS_PER_EM
+for (const {
+  char,
+  codePoint,
+  path,
+  advanceWidth,
+  leftSideBearing,
+  glyphWidth,
+  xMin,
+} of glyphData) {
+  const targetAdvanceWidth = useArialSpacing ? advanceWidth : MONOSPACE_WIDTH
+  const targetLeftSideBearing = useArialSpacing
+    ? leftSideBearing
+    : (targetAdvanceWidth - glyphWidth) / 2
+
+  if (!useArialSpacing) {
+    const xShift = targetLeftSideBearing - xMin
+    translatePath(path, xShift, 0)
+  }
 
   glyphs.push(
     new opentype.Glyph({
       name: char,
       unicode: codePoint,
-      advanceWidth: MONOSPACE_WIDTH,
+      advanceWidth: targetAdvanceWidth,
       path,
-      leftSideBearing,
+      leftSideBearing: targetLeftSideBearing,
     }),
   )
 }
