@@ -33,7 +33,7 @@
     "build": "tsup-node ./index.ts --format esm --dts && bun run build:font && bun run build:base64font",
     "build:font": "bun scripts/build-font.ts",
     "build:base64font": "bun scripts/encode-font.ts",
-    "generate-alphabet-paths": "bun scripts/normalize-svg-alphabet.ts",
+    "generate-alphabet-paths": "bun scripts/generate-alphabet-paths.ts",
     "format": "biome format --write .",
     "format:check": "biome format --write ."
   },

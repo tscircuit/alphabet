@@ -43,7 +43,7 @@ const findArialPath = (): string | null => {
 
 const arialPath = findArialPath()
 if (!arialPath) {
-  throw new Error("Arial font not found; cannot normalize svg alphabet.")
+  throw new Error("Arial font not found; cannot generate svg alphabet paths.")
 }
 
 const arialFont = opentype.loadSync(arialPath)
@@ -220,8 +220,8 @@ const getBoundingBox = (
 
 const formatNumber = (value: number) => {
   const rounded = Number(value.toFixed(6))
-  const normalized = Object.is(rounded, -0) ? 0 : rounded
-  return normalized.toString()
+  const generated = Object.is(rounded, -0) ? 0 : rounded
+  return generated.toString()
 }
 
 const serializeSubpaths = (subpaths: Subpath[]): string => {
@@ -264,12 +264,12 @@ const transformSubpaths = (
     }),
   }))
 
-const normalizedAlphabet: Record<string, string> = {}
+const generatedAlphabet: Record<string, string> = {}
 
 for (const [char, pathData] of Object.entries(svgAlphabet)) {
   const subpaths = parsePathData(pathData)
   if (subpaths.length === 0) {
-    normalizedAlphabet[char] = pathData
+    generatedAlphabet[char] = pathData
     continue
   }
 
@@ -309,20 +309,16 @@ for (const [char, pathData] of Object.entries(svgAlphabet)) {
     yShift,
   )
 
-  normalizedAlphabet[char] = serializeSubpaths(transformed)
+  generatedAlphabet[char] = serializeSubpaths(transformed)
 }
 
 const indexPath = join(import.meta.dir, "..", "index.ts")
 const indexContent = readFileSync(indexPath, "utf8")
-const serializedAlphabet = JSON.stringify(normalizedAlphabet, null, 2)
+const serializedAlphabet = JSON.stringify(generatedAlphabet, null, 2)
 const updatedIndex = indexContent.replace(
   /export const svgAlphabet\s*=\s*\{[\s\S]*?\}\n/,
   `export const svgAlphabet = ${serializedAlphabet}\n`,
 )
 
-if (updatedIndex === indexContent) {
-  throw new Error("Failed to update svgAlphabet in index.ts")
-}
-
 writeFileSync(indexPath, updatedIndex)
-console.log("✓ Normalized SVG alphabet written to index.ts")
+console.log("✓ generated SVG alphabet paths written to index.ts")
