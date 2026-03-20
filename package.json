@@ -8,6 +8,10 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./outline-polygons": {
+      "types": "./dist/outline-polygons.d.ts",
+      "default": "./dist/outline-polygons.js"
+    },
     "./base64font": {
       "types": "./dist/base64font.d.ts",
       "default": "./dist/base64font.js"
@@ -24,16 +28,18 @@
     "@types/opentype.js": "^1.3.8",
     "bun-match-svg": "^0.0.11",
     "opentype.js": "^1.3.4",
+    "polygon-clipping": "^0.15.7",
     "tsup": "^8.3.0"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
   "scripts": {
-    "build": "tsup-node ./index.ts --format esm --dts && bun run build:font && bun run build:base64font",
+    "build": "tsup-node ./index.ts ./outline-polygons.ts --format esm --dts && bun run build:font && bun run build:base64font",
     "build:font": "bun scripts/build-font.ts",
     "build:base64font": "bun scripts/encode-font.ts",
     "generate-alphabet-paths": "bun scripts/generate-alphabet-paths.ts",
+    "generate-alphabet-outlines": "bun scripts/generate-alphabet-outlines.ts",
     "format": "biome format --write .",
     "format:check": "biome format --write ."
   },
