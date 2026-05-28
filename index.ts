@@ -223,3 +223,9 @@ export const textMetrics = {
   strokeWidthRatio,
   letterSpacingRatio,
 }
+// Multi-font registry (W15.P2 — EnergyCitizen fork) — re-export so
+// existing imports still work without changes; new callers can use:
+//   import { getFont } from '@tscircuit/alphabet'
+//   const ubuntu = getFont('ubuntu')
+export { getFont, FONT_NAMES, ubuntu } from './fonts'
+export type { FontName, FontModule } from './fonts'

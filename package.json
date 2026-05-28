@@ -1,6 +1,6 @@
 {
   "name": "@tscircuit/alphabet",
-  "version": "0.0.25",
+  "version": "0.0.25-ec.1",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -40,6 +40,7 @@
     "build:base64font": "bun scripts/encode-font.ts",
     "generate-alphabet-paths": "bun scripts/generate-alphabet-paths.ts",
     "generate-alphabet-outlines": "bun scripts/generate-alphabet-outlines.ts",
+    "generate-ubuntu-data": "bun scripts/generate-ubuntu-data.ts",
     "format": "biome format --write .",
     "format:check": "biome format --write ."
   },
