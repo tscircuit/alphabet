@@ -1,9 +1,9 @@
 import { mkdirSync, writeFileSync } from "node:fs"
 import { dirname, join } from "node:path"
+import { BooleanOperations, Polygon } from "@flatten-js/core"
 import * as opentype from "opentype.js"
-import { Polygon, BooleanOperations } from "@flatten-js/core"
 
-import { svgAlphabet } from "../index.ts"
+import { glyphAdvanceRatio, svgAlphabet } from "../index.ts"
 
 const UNITS_PER_EM = 1000
 // Match Arial's proportions: ascender at ~90.5% and descender at ~21.2% of em
@@ -239,8 +239,8 @@ for (const [char, pathData] of Object.entries(svgAlphabet)) {
   glyphData.push({ char, codePoint, path, bbox, glyphWidth })
 }
 
-// Second pass: create glyphs with fixed monospace width
-// Monospace width equals the widest glyph (no extra padding).
+// Second pass: create glyphs with the advances exported by the alphabet.
+// The missing-glyph box keeps the widest standard advance.
 const glyphs: opentype.Glyph[] = [
   new opentype.Glyph({
     name: ".notdef",
@@ -250,12 +250,12 @@ const glyphs: opentype.Glyph[] = [
   }),
 ]
 
-for (const { char, codePoint, path, bbox, glyphWidth } of glyphData) {
+for (const { char, codePoint, path } of glyphData) {
   glyphs.push(
     new opentype.Glyph({
       name: char,
       unicode: codePoint,
-      advanceWidth: maxGlyphWidth,
+      advanceWidth: glyphAdvanceRatio[char] * UNITS_PER_EM,
       path,
     }),
   )
