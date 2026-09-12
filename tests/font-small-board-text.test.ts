@@ -31,9 +31,16 @@ test("renders narrow lowercase glyphs with balanced spacing", () => {
   const font = opentype.loadSync(fontPath)
   const lowercaseIAdvance = font.charToGlyph("i").advanceWidth ?? 0
   const lowercaseLAdvance = font.charToGlyph("l").advanceWidth ?? 0
-  const standardAdvance = font.charToGlyph("a").advanceWidth ?? 0
+  const lowercaseIBounds = font.charToGlyph("i").getBoundingBox()
+  const lowercaseLBounds = font.charToGlyph("l").getBoundingBox()
+  const standardGlyph = font.charToGlyph("a")
+  const baselineGlyph = font.charToGlyph("m")
+  const standardAdvance = standardGlyph.advanceWidth ?? 0
   expect(lowercaseIAdvance).toBe(400)
   expect(lowercaseLAdvance).toBe(400)
+  expect((lowercaseIBounds.x1 + lowercaseIBounds.x2) / 2).toBe(200)
+  expect((lowercaseLBounds.x1 + lowercaseLBounds.x2) / 2).toBe(200)
+  expect(lowercaseLBounds.y1).toBe(baselineGlyph.getBoundingBox().y1)
   expect(lowercaseIAdvance).toBeLessThan(standardAdvance)
   expect(lowercaseLAdvance).toBeLessThan(standardAdvance)
 })
