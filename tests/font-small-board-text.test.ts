@@ -4,7 +4,7 @@ import { join } from "node:path"
 import { Resvg } from "@resvg/resvg-js"
 import * as opentype from "opentype.js"
 
-test("renders adjacent lowercase l characters without a misleading gap", () => {
+test("renders narrow lowercase glyphs with balanced spacing", () => {
   const fontPath = join(process.cwd(), "TscircuitAlphabet.ttf")
   const svg = `<svg width="640" height="320" xmlns="http://www.w3.org/2000/svg">
   <rect width="640" height="320" fill="black"/>
@@ -29,8 +29,11 @@ test("renders adjacent lowercase l characters without a misleading gap", () => {
   expect(pngBuffer.length).toBeGreaterThan(1000)
 
   const font = opentype.loadSync(fontPath)
+  const lowercaseIAdvance = font.charToGlyph("i").advanceWidth ?? 0
   const lowercaseLAdvance = font.charToGlyph("l").advanceWidth ?? 0
   const standardAdvance = font.charToGlyph("a").advanceWidth ?? 0
-  expect(lowercaseLAdvance).toBe(200)
+  expect(lowercaseIAdvance).toBe(400)
+  expect(lowercaseLAdvance).toBe(400)
+  expect(lowercaseIAdvance).toBeLessThan(standardAdvance)
   expect(lowercaseLAdvance).toBeLessThan(standardAdvance)
 })
