@@ -31,6 +31,6 @@ test("renders adjacent lowercase l characters without a misleading gap", () => {
   const font = opentype.loadSync(fontPath)
   const lowercaseLAdvance = font.charToGlyph("l").advanceWidth ?? 0
   const standardAdvance = font.charToGlyph("a").advanceWidth ?? 0
-  expect(lowercaseLAdvance).toBe(376)
+  expect(lowercaseLAdvance).toBe(200)
   expect(lowercaseLAdvance).toBeLessThan(standardAdvance)
 })
