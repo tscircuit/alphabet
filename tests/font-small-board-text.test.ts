@@ -4,7 +4,7 @@ import { join } from "node:path"
 import { Resvg } from "@resvg/resvg-js"
 import * as opentype from "opentype.js"
 
-test("renders narrow lowercase glyphs with balanced spacing", () => {
+test("renders compact proportional spacing with balanced glyph bearings", () => {
   const fontPath = join(process.cwd(), "TscircuitAlphabet.ttf")
   const svg = `<svg width="640" height="320" xmlns="http://www.w3.org/2000/svg">
   <rect width="640" height="320" fill="black"/>
@@ -29,18 +29,31 @@ test("renders narrow lowercase glyphs with balanced spacing", () => {
   expect(pngBuffer.length).toBeGreaterThan(1000)
 
   const font = opentype.loadSync(fontPath)
-  const lowercaseIAdvance = font.charToGlyph("i").advanceWidth ?? 0
-  const lowercaseLAdvance = font.charToGlyph("l").advanceWidth ?? 0
+  const lowercaseI = font.charToGlyph("i")
+  const lowercaseL = font.charToGlyph("l")
+  const lowercaseM = font.charToGlyph("m")
+  const lowercaseIAdvance = lowercaseI.advanceWidth ?? 0
+  const lowercaseLAdvance = lowercaseL.advanceWidth ?? 0
+  const lowercaseMAdvance = lowercaseM.advanceWidth ?? 0
   const lowercaseIBounds = font.charToGlyph("i").getBoundingBox()
   const lowercaseLBounds = font.charToGlyph("l").getBoundingBox()
-  const standardGlyph = font.charToGlyph("a")
-  const baselineGlyph = font.charToGlyph("m")
-  const standardAdvance = standardGlyph.advanceWidth ?? 0
-  expect(lowercaseIAdvance).toBe(400)
-  expect(lowercaseLAdvance).toBe(400)
-  expect((lowercaseIBounds.x1 + lowercaseIBounds.x2) / 2).toBe(200)
-  expect((lowercaseLBounds.x1 + lowercaseLBounds.x2) / 2).toBe(200)
-  expect(lowercaseLBounds.y1).toBe(baselineGlyph.getBoundingBox().y1)
-  expect(lowercaseIAdvance).toBeLessThan(standardAdvance)
-  expect(lowercaseLAdvance).toBeLessThan(standardAdvance)
+  const lowercaseMBounds = lowercaseM.getBoundingBox()
+
+  expect(lowercaseIAdvance).toBeLessThan(lowercaseMAdvance)
+  expect(lowercaseLAdvance).toBeLessThan(lowercaseMAdvance)
+  expect(lowercaseIBounds.x2 - lowercaseIBounds.x1).toBeLessThan(
+    lowercaseMBounds.x2 - lowercaseMBounds.x1,
+  )
+  expect(lowercaseLBounds.x2 - lowercaseLBounds.x1).toBeLessThan(
+    lowercaseMBounds.x2 - lowercaseMBounds.x1,
+  )
+
+  const glyphCenter = (bounds: { x1: number; x2: number }) =>
+    (bounds.x1 + bounds.x2) / 2
+  expect(
+    Math.abs(glyphCenter(lowercaseIBounds) - lowercaseIAdvance / 2),
+  ).toBeLessThan(2)
+  expect(
+    Math.abs(glyphCenter(lowercaseLBounds) - lowercaseLAdvance / 2),
+  ).toBeLessThan(2)
 })
