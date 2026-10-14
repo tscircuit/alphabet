@@ -17,10 +17,64 @@ const SOURCE_LICENSE_PATH = join(
   "DEJAVU-LICENSE.txt",
 )
 
+// Keep the DejaVu Sans Mono outlines, but do not keep its terminal-style fixed
+// cells. PCB labels are read as compact annotations, so each glyph gets an
+// optical advance based on its ink width plus a small, consistent side bearing.
+// Wide glyphs never exceed the source font's advance.
+const OPTICAL_SIDE_BEARING_RATIO = 0.035
+const SPACE_ADVANCE_RATIO = 0.35
+
 const clonePath = (sourcePath: opentype.Path): opentype.Path => {
   const path = new opentype.Path()
   path.commands = sourcePath.commands.map((command) => ({ ...command }))
   return path
+}
+
+const translatePathX = (
+  sourcePath: opentype.Path,
+  deltaX: number,
+): opentype.Path => {
+  const path = new opentype.Path()
+  path.commands = sourcePath.commands.map((command) => {
+    const translated = { ...command }
+    if ("x" in translated && typeof translated.x === "number") {
+      translated.x += deltaX
+    }
+    if ("x1" in translated && typeof translated.x1 === "number") {
+      translated.x1 += deltaX
+    }
+    if ("x2" in translated && typeof translated.x2 === "number") {
+      translated.x2 += deltaX
+    }
+    return translated
+  })
+  return path
+}
+
+const getOpticalGlyphMetrics = (sourceGlyph: opentype.Glyph) => {
+  const sourceAdvance = sourceGlyph.advanceWidth ?? sourceFont.unitsPerEm
+  if (!sourceGlyph.path.commands.length) {
+    return {
+      advanceWidth: Math.round(sourceFont.unitsPerEm * SPACE_ADVANCE_RATIO),
+      leftSideBearing: 0,
+      path: clonePath(sourceGlyph.path),
+    }
+  }
+
+  const bounds = sourceGlyph.getBoundingBox()
+  const inkWidth = bounds.x2 - bounds.x1
+  const sideBearing = sourceFont.unitsPerEm * OPTICAL_SIDE_BEARING_RATIO
+  const advanceWidth = Math.round(
+    Math.min(sourceAdvance, inkWidth + sideBearing * 2),
+  )
+  const leftSideBearing = (advanceWidth - inkWidth) / 2
+  const deltaX = leftSideBearing - bounds.x1
+
+  return {
+    advanceWidth,
+    leftSideBearing,
+    path: translatePathX(sourceGlyph.path, deltaX),
+  }
 }
 
 const sourceFont = opentype.loadSync(SOURCE_FONT_PATH)
@@ -49,13 +103,14 @@ for (const char of supportedCharacters) {
   }
 
   const sourceGlyph = sourceFont.glyphs.get(glyphIndex)
+  const metrics = getOpticalGlyphMetrics(sourceGlyph)
   glyphs.push(
     new opentype.Glyph({
       name: sourceGlyph.name,
       unicode: codePoint,
-      advanceWidth: sourceGlyph.advanceWidth,
-      leftSideBearing: sourceGlyph.leftSideBearing,
-      path: clonePath(sourceGlyph.path),
+      advanceWidth: metrics.advanceWidth,
+      leftSideBearing: metrics.leftSideBearing,
+      path: metrics.path,
     }),
   )
 }

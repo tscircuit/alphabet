@@ -4,7 +4,7 @@ import { join } from "node:path"
 import { Resvg } from "@resvg/resvg-js"
 import * as opentype from "opentype.js"
 
-test("renders a conventional monospace font with balanced glyph bearings", () => {
+test("renders compact proportional spacing with balanced glyph bearings", () => {
   const fontPath = join(process.cwd(), "TscircuitAlphabet.ttf")
   const svg = `<svg width="640" height="320" xmlns="http://www.w3.org/2000/svg">
   <rect width="640" height="320" fill="black"/>
@@ -39,8 +39,8 @@ test("renders a conventional monospace font with balanced glyph bearings", () =>
   const lowercaseLBounds = font.charToGlyph("l").getBoundingBox()
   const lowercaseMBounds = lowercaseM.getBoundingBox()
 
-  expect(lowercaseIAdvance).toBe(lowercaseLAdvance)
-  expect(lowercaseLAdvance).toBe(lowercaseMAdvance)
+  expect(lowercaseIAdvance).toBeLessThan(lowercaseMAdvance)
+  expect(lowercaseLAdvance).toBeLessThan(lowercaseMAdvance)
   expect(lowercaseIBounds.x2 - lowercaseIBounds.x1).toBeLessThan(
     lowercaseMBounds.x2 - lowercaseMBounds.x1,
   )
@@ -50,7 +50,10 @@ test("renders a conventional monospace font with balanced glyph bearings", () =>
 
   const glyphCenter = (bounds: { x1: number; x2: number }) =>
     (bounds.x1 + bounds.x2) / 2
-  const cellCenter = lowercaseIAdvance / 2
-  expect(Math.abs(glyphCenter(lowercaseIBounds) - cellCenter)).toBeLessThan(30)
-  expect(Math.abs(glyphCenter(lowercaseLBounds) - cellCenter)).toBeLessThan(30)
+  expect(
+    Math.abs(glyphCenter(lowercaseIBounds) - lowercaseIAdvance / 2),
+  ).toBeLessThan(2)
+  expect(
+    Math.abs(glyphCenter(lowercaseLBounds) - lowercaseLAdvance / 2),
+  ).toBeLessThan(2)
 })
