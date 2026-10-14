@@ -54,6 +54,10 @@ bun run generate-alphabet-outlines
 
 ## Development
 
+The bundled `TscircuitAlphabet.ttf` is a supported-character subset of DejaVu
+Sans Mono with the family name rewritten for tscircuit. Its license is included
+in `assets/DEJAVU-LICENSE.txt` and copied into the published `dist` directory.
+
 To run the project:
 
 ```bash

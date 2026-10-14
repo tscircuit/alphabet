@@ -7,6 +7,7 @@ import * as opentype from "opentype.js"
 import { svgAlphabet } from "../index"
 
 const DEJAVU_PATHS = [
+  join(process.cwd(), "assets", "DejaVuSansMono.ttf"),
   "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
   "/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf",
   "/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Oblique.ttf",
