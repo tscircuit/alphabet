@@ -250,6 +250,17 @@ const glyphs: opentype.Glyph[] = [
   }),
 ]
 
+if (!Object.hasOwn(svgAlphabet, " ")) {
+  glyphs.push(
+    new opentype.Glyph({
+      name: "space",
+      unicode: 32,
+      advanceWidth: glyphAdvanceRatio[" "] * UNITS_PER_EM,
+      path: new opentype.Path(),
+    }),
+  )
+}
+
 for (const { char, codePoint, path } of glyphData) {
   glyphs.push(
     new opentype.Glyph({
